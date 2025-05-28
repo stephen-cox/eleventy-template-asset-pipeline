@@ -1,0 +1,26 @@
+{
+  "name": "@src-dev/eleventy-template-asset-pipeline",
+  "version": "0.1.0",
+  "description": "Eleventy plugin to provide asset pipelines as part of the 11ty build process.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephen-cox/eleventy-template-asset-pipeline.git"
+  },
+  "keywords": [
+    "11ty",
+    "eleventy",
+    "eleventy-plugin",
+    "asset",
+    "pipeline"
+  ],
+  "author": "Stephen Cox <web@stephencox.net> (https://stephencox.net)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stephen-cox/eleventy-template-asset-pipeline/issues"
+  },
+  "homepage": "https://github.com/stephen-cox/eleventy-template-asset-pipeline#readme"
+}
