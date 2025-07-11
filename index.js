@@ -7,15 +7,10 @@ const ProcessAssets = require('./src/ProcessAssets');
 const assetLink = require('./src/shortcodes/assetLink');
 const scriptLink = require('./src/shortcodes/scriptLink');
 
-// Virtual templates.
-const ProcessScripts = require('./src/templates/ProcessScripts');
-const ProcessStyles = require('./src/templates/ProcessStyles');
-
 // Default options.
 const defaultOptions = {
   styles: {
     enabled: false,
-    class: 'ProcessAssets',
     inExtension: 'css',
     inDirectory: './_assets/css',
     outExtension: 'css',
@@ -25,7 +20,6 @@ const defaultOptions = {
   },
   scripts: {
     enabled: false,
-    class: 'ProcessAssets',
     inExtension: 'js',
     inDirectory: './_assets/js',
     outExtension: 'js',
@@ -45,7 +39,7 @@ async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {})
 
   // Virtual templates.
   if (options.styles.enabled) {
-    eleventyConfig.addTemplate('styles.11ty.js', eval('new ' + options.styles.class + '(options.styles)'));
+    eleventyConfig.addTemplate('styles.11ty.js', new ProcessAssets(options.styles));
     eleventyConfig.addCollection(options.styles.collection, function (collectionsApi) {
       return collectionsApi.getAll().filter(function (item) {
 			  return 'asset' in item.data && item.data.asset.includes(options.styles.collection);

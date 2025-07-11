@@ -3,8 +3,6 @@
  */
 
 const crypto = require('crypto');
-const fs = require('fs');
-const fsPromises = fs.promises;
 const glob = require('glob');
 const path = require('path');
 
@@ -19,11 +17,12 @@ class ProcessAssets {
    *
    * @param {object} config Class configuration object.
    * @param {string} config.collection Collection to add all processed files to;. Default _assets.
-   * @param {string} config.inDirectory Directory to process.
+   * @param {string|array} config.inDirectory Directory to process.
    * @param {string} config.inExtension File extension to process.
    * @param {string} config.outDirectory Directory to write files to.
    * @param {string} config.outExtension File extension to output.
    * @param {boolean} config.production Is this a production build.
+   * @param {function} config.processFile Function to process file.
    */
   constructor(config) {
     if ('collection' in config) {
@@ -38,10 +37,17 @@ class ProcessAssets {
     else {
       this.production = false;
     }
+    if (config.inDirectory instanceof Array) {
+      this.inDirectory = config.inDirectory;
+    }
+    else {
+      this.inDirectory = [config.inDirectory];
+    }
     this.inDirectory = config.inDirectory;
     this.inExtension = config.inExtension;
     this.outDirectory = config.outDirectory;
     this.outExtension = config.outExtension;
+    this.processFile = config.processFile;
   }
 
   /**
@@ -61,7 +67,7 @@ class ProcessAssets {
         size: 1,
       },
       layout: '',
-      //tags: [this.collection],
+      tags: [this.collection],
       asset: [this.collection],
       data: await this.processDirectory(),
     };
@@ -88,7 +94,7 @@ class ProcessAssets {
 
       const basename = path.basename(file, `.${this.inExtension}`);
       const filename = `${basename}.${this.inExtension}`;
-      const content = await this.processFile(file);
+      const content = await this.processFile(file, this.production);
 
       // Production build.
       if (this.production) {
@@ -119,29 +125,6 @@ class ProcessAssets {
     }
 
     return files;
-  }
-
-  /**
-   * Process a single file.
-   *
-   * The method should be overridden in child classes.
-   *
-   * @param {string} file File to process.
-   * @returns {Promise} Returns a promise that resolves to the processed content.
-   */
-  async processFile(file) {
-
-    // This simply reads the file and returns the content.
-    // The method should be overridden in child classes.
-    return new Promise((resolve, reject) => {
-      fs.readFile(file, 'utf8', (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
-    });
   }
 
   /**
