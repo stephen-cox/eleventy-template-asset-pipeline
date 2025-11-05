@@ -23,4 +23,4 @@ const scriptLink = function(collection, key) {
   return '';
 }
 
-module.exports = scriptLink;
+export default scriptLink;

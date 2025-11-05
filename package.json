@@ -2,6 +2,7 @@
   "name": "@src-dev/eleventy-template-asset-pipeline",
   "version": "0.1.1",
   "description": "Eleventy plugin to provide asset pipelines as part of the 11ty build process.",
+  "type": "module",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -20,7 +21,15 @@
     "url": "https://github.com/stephen-cox/eleventy-template-asset-pipeline/issues"
   },
   "homepage": "https://github.com/stephen-cox/eleventy-template-asset-pipeline#readme",
+  "scripts": {
+    "test": "ava",
+    "test:watch": "ava --watch"
+  },
   "dependencies": {
     "glob": "^11.0.3"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "ava": "^6.2.0"
   }
 }

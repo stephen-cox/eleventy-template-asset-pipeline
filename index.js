@@ -3,9 +3,9 @@
  */
 
 // Shortcodes.
-const ProcessAssets = require('./src/ProcessAssets');
-const assetLink = require('./src/shortcodes/assetLink');
-const scriptLink = require('./src/shortcodes/scriptLink');
+import ProcessAssets from './src/ProcessAssets.js';
+import assetLink from './src/shortcodes/assetLink.js';
+import scriptLink from './src/shortcodes/scriptLink.js';
 
 // Default options.
 const defaultOptions = {
@@ -47,7 +47,7 @@ async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {})
     });
   }
   if (options.scripts.enabled) {
-    eleventyConfig.addTemplate('scripts.11ty.js', eval('new ' + options.scripts.class + '(options.scripts)'));
+    eleventyConfig.addTemplate('scripts.11ty.js', new ProcessAssets(options.scripts));
     eleventyConfig.addCollection(options.scripts.collection, function (collectionsApi) {
       return collectionsApi.getAll().filter(function (item) {
 			  return 'asset' in item.data && item.data.asset.includes(options.scripts.collection);
@@ -56,4 +56,4 @@ async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {})
   }
 }
 
-module.exports = eleventyTemplateAssetPipeline;
+export default eleventyTemplateAssetPipeline;

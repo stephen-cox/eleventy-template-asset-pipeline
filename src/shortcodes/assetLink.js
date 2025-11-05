@@ -33,4 +33,4 @@ const assetLink = function(collection, key, attributes = {}) {
   return '';
 }
 
-module.exports = assetLink;
+export default assetLink;
