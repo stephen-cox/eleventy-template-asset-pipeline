@@ -102,7 +102,7 @@ test('ProcessAssets.processDirectory() - finds and processes CSS files in develo
   t.true(Array.isArray(files));
   t.is(files.length, 1); // Only sample.css, not nested/nested.css
   t.is(files[0].index, 'sample.css');
-  t.regex(files[0].source, /test\/fixtures\/sample\.css$/);
+  t.regex(files[0].source, /test[\/\\]fixtures[\/\\]sample\.css$/); // Windows uses \, Unix uses /
   t.is(files[0].destination, '_assets/css/sample.css');
   t.truthy(files[0].content);
   t.is(files[0].integrity, undefined); // No integrity in development
@@ -206,7 +206,7 @@ test('ProcessAssets.processDirectory() - calls processFile with correct argument
 
   await processor.processDirectory();
 
-  t.regex(capturedFile, /test\/fixtures\/sample\.css$/);
+  t.regex(capturedFile, /test[\/\\]fixtures[\/\\]sample\.css$/); // Windows uses \, Unix uses /
   t.is(capturedProduction, true);
 });
 
