@@ -3,7 +3,14 @@
   "version": "0.1.1",
   "description": "Eleventy plugin to provide asset pipelines as part of the 11ty build process.",
   "type": "module",
-  "main": "index.js",
+  "main": "index.cjs",
+  "module": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stephen-cox/eleventy-template-asset-pipeline.git"

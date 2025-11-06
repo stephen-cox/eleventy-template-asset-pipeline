@@ -9,6 +9,14 @@ This plugin uses [JavaScript templates](https://www.11ty.dev/docs/languages/java
 
 There are two ways to use this, either creating a JS template that loads and configures the ProcessAssets class or take advantage of the styles and scripts [Virtual Templates](https://www.11ty.dev/docs/virtual-templates/) provided by this plugin. In both cases it's necessary to provide an async function that takes the path to a file and returns a Promise with the compiled assets. This allows the use of tools such as PostCSS, Sass and Webpack as part of an Eleventy build without having to use a separate task runner such as Gulp.
 
+## Module Support
+
+This package is published as an ES Module but includes full CommonJS interoperability:
+- **ESM**: Import using `import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline'`
+- **CommonJS**: Require using `const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline')`
+
+Both module systems are fully supported and tested.
+
 ## Using the virtual templates
 
 To use the virtual templates, define the processFile function and then pass this with the necessary configuration when initialising the plugin.
@@ -48,33 +56,66 @@ const processFilePostCss = async function(file, production) {
 
 Then configure the plugin to use this plugin to process CSS files in a directory. Using the postcss-import plugin gives the ability to process a single file that loads all your CSS files in subdirectories.
 
+**ESM (ES Modules):**
+```js
+import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
+
+export default function(eleventyConfig) {
+  eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+    styles: {
+      enabled: true,
+      collection: '_styles',
+      inExtension: 'css',
+      inDirectory: '_assets/css',
+      outExtension: 'css',
+      outDirectory: '_assets/css',
+      processFile: processFilePostCss,
+      production: process.env.ELEVENTY_ENV === 'production',
+    }
+  });
+}
+```
+
+**CommonJS:**
 ```js
 const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
 
-eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
-  styles: {
-    enabled: true,
-    collection: '_styles',
-    inExtension: 'css',
-    inDirectory: '_assets/css',
-    outExtension: 'css',
-    outDirectory: '_assets/css',
-    processFile: processFilePostCss,
-    production: process.env.ELEVENTY_ENV === 'production',
-  }
-});
+module.exports = async function(eleventyConfig) {
+  await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+    styles: {
+      enabled: true,
+      collection: '_styles',
+      inExtension: 'css',
+      inDirectory: '_assets/css',
+      outExtension: 'css',
+      outDirectory: '_assets/css',
+      processFile: processFilePostCss,
+      production: process.env.ELEVENTY_ENV === 'production',
+    }
+  });
+};
 ```
 
 ## Subclassing ProcessAssets
 
 It's possible to create the JavaScript templates directly, rather than relying on the virtual templates. To do this initialise the plugin in the 11ty config file with no extra settings.
 
+**ESM (ES Modules):**
+```js
+import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
+
+export default function(eleventyConfig) {
+  eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
+}
+```
+
+**CommonJS:**
 ```js
 const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
 
-module.exports = function(eleventyConfig) {
-  eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
-}
+module.exports = async function(eleventyConfig) {
+  await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
+};
 ```
 
 Then in the directory containing files to process (e.g. your CSS or JavaScript files) create an 11ty JavaScript template that exports an instance of the ProcessAssets class with the `processFile` method defined.
