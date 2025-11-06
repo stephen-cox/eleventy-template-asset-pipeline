@@ -31,25 +31,48 @@ You can also import specific modules directly:
 
 **ProcessAssets Class:**
 ```js
-// ESM
+// ESM (.js files or imports)
 import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
 
-// CommonJS
+// CommonJS (only in .cjs files or projects without "type": "module")
 const ProcessAssets = await require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
 ```
 
 **Shortcodes:**
 ```js
-// ESM
+// ESM (.js files or imports)
 import assetLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink';
 import scriptLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink';
 
-// CommonJS
+// CommonJS (only in .cjs files or projects without "type": "module")
 const assetLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink');
 const scriptLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink');
 ```
 
-**Note:** When using `require()` for individual modules in CommonJS, you must `await` the result as they return Promises that resolve to the module.
+**Important Notes:**
+- `require()` **only works in actual CommonJS files** (`.cjs` extension or projects without `"type": "module"` in package.json)
+- If you're using `.js` files in a project with `"type": "module"`, you **must use ESM `import` syntax**
+- When using `require()` for individual modules, you must `await` the result as they return Promises
+
+### File Extension Guide for 11ty Templates
+
+When creating 11ty template files that use ProcessAssets:
+
+**If your project has `"type": "module"` in package.json:**
+- Use `.11ty.js` extension with ESM `import` syntax
+- Example: `_styles.11ty.js`
+```js
+import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
+export default new ProcessAssets({ /* config */ });
+```
+
+**If you want to use CommonJS:**
+- Use `.11ty.cjs` extension with `require()` syntax
+- Example: `_styles.11ty.cjs`
+```js
+const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+module.exports = ProcessAssetsPromise.then(PA => new PA({ /* config */ }));
+```
 
 ## Using the virtual templates
 
