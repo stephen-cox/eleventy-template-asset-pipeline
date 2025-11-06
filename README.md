@@ -11,11 +11,45 @@ There are two ways to use this, either creating a JS template that loads and con
 
 ## Module Support
 
-This package is published as an ES Module but includes full CommonJS interoperability:
-- **ESM**: Import using `import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline'`
-- **CommonJS**: Require using `const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline')`
+This package is published as an ES Module but includes full CommonJS interoperability through dual package exports. Both the main entry point and individual subpaths can be imported using either module system.
 
-Both module systems are fully supported and tested.
+### Main Entry Point
+
+**ESM:**
+```js
+import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
+```
+
+**CommonJS:**
+```js
+const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
+```
+
+### Importing Individual Modules
+
+You can also import specific modules directly:
+
+**ProcessAssets Class:**
+```js
+// ESM
+import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
+
+// CommonJS
+const ProcessAssets = await require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+```
+
+**Shortcodes:**
+```js
+// ESM
+import assetLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink';
+import scriptLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink';
+
+// CommonJS
+const assetLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink');
+const scriptLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink');
+```
+
+**Note:** When using `require()` for individual modules in CommonJS, you must `await` the result as they return Promises that resolve to the module.
 
 ## Using the virtual templates
 
@@ -120,18 +154,19 @@ module.exports = async function(eleventyConfig) {
 
 Then in the directory containing files to process (e.g. your CSS or JavaScript files) create an 11ty JavaScript template that exports an instance of the ProcessAssets class with the `processFile` method defined.
 
-To process JavaScript files using Webpack, you would create a `_scripts.11ty.js` file in the root of you scripts directory that looked like:
+To process JavaScript files using Webpack, you would create a `_scripts.11ty.js` file in the root of you scripts directory.
 
+**ESM (_scripts.11ty.js):**
 ```js
 /**
  * Process JavaScript files using the ProcessAssets class.
  */
 
-const fs = require('fs');
-const path = require('path');
-const webpack = require('webpack');
-const { fs: mfs } = require('memfs');
-const ProcessAssets = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+import fs from 'fs';
+import path from 'path';
+import webpack from 'webpack';
+import { fs as mfs } from 'memfs';
+import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
 
 
 /**
@@ -171,7 +206,71 @@ async function processFile(file) {
   });
 }
 
-module.exports = new ProcessAssets({
+export default new ProcessAssets({
+  inExtension: 'js',
+  inDirectory: import.meta.dirname,
+  outExtension: 'js',
+  outDirectory: '_assets/js',
+  collection: '_scripts',
+  processFile: processFile,
+  production: process.env.ELEVENTY_ENV === 'production' || process.env.ELEVENTY_ENV === 'stage',
+});
+```
+
+**CommonJS (_scripts.11ty.cjs):**
+```js
+/**
+ * Process JavaScript files using the ProcessAssets class.
+ */
+
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
+const { fs: mfs } = require('memfs');
+
+// Note: await the require() for individual modules
+const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+
+
+/**
+ * Process JS files.
+ */
+async function processFile(file) {
+  const production = process.env.ELEVENTY_ENV;
+
+  // Setup Webpack.
+  const webpackConfig = {
+    mode: production ? 'production' : 'development',
+    entry: file,
+    output: {
+      filename: path.basename(file),
+      path: path.resolve('/'),
+    },
+  };
+  const compiler = webpack(webpackConfig);
+  compiler.outputFileSystem = mfs;
+  compiler.inputFileSystem = fs;
+  compiler.intermediateFileSystem = mfs;
+
+  // Compile file.
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      if (err || stats.hasErrors()) {
+        const errors = err || (stats.compilation ? stats.compilation.errors : null);
+        reject(errors);
+        return;
+      }
+
+      mfs.readFile(webpackConfig.output.path + '/' + webpackConfig.output.filename, 'utf8', (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+  });
+}
+
+// Await the ProcessAssets class and create instance
+module.exports = ProcessAssetsPromise.then(ProcessAssets => new ProcessAssets({
   inExtension: 'js',
   inDirectory: __dirname,
   outExtension: 'js',
@@ -179,5 +278,5 @@ module.exports = new ProcessAssets({
   collection: '_scripts',
   processFile: processFile,
   production: process.env.ELEVENTY_ENV === 'production' || process.env.ELEVENTY_ENV === 'stage',
-});
+}));
 ```

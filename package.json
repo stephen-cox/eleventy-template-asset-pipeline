@@ -9,6 +9,18 @@
     ".": {
       "import": "./index.js",
       "require": "./index.cjs"
+    },
+    "./src/ProcessAssets": {
+      "import": "./src/ProcessAssets.js",
+      "require": "./src/ProcessAssets.cjs"
+    },
+    "./src/shortcodes/assetLink": {
+      "import": "./src/shortcodes/assetLink.js",
+      "require": "./src/shortcodes/assetLink.cjs"
+    },
+    "./src/shortcodes/scriptLink": {
+      "import": "./src/shortcodes/scriptLink.js",
+      "require": "./src/shortcodes/scriptLink.cjs"
     }
   },
   "repository": {
