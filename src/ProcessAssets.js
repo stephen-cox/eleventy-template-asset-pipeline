@@ -2,9 +2,9 @@
  * Javascript template class to process static assets.
  */
 
-const crypto = require('crypto');
-const glob = require('glob');
-const path = require('path');
+import crypto from 'crypto';
+import { glob } from 'glob';
+import path from 'path';
 
 
 /**
@@ -43,7 +43,6 @@ class ProcessAssets {
     else {
       this.inDirectory = [config.inDirectory];
     }
-    this.inDirectory = config.inDirectory;
     this.inExtension = config.inExtension;
     this.outDirectory = config.outDirectory;
     this.outExtension = config.outExtension;
@@ -85,7 +84,7 @@ class ProcessAssets {
     let files = [];
 
     // Find all style files in top-level directory.
-    for (const file of glob.sync(`${this.inDirectory}/*.${this.inExtension}`)) {
+    for (const file of await glob(`${this.inDirectory}/*.${this.inExtension}`)) {
 
       // Don't process 11ty JS template files.
       if (file.endsWith('.11ty.js')) {
@@ -136,4 +135,4 @@ class ProcessAssets {
 }
 
 
-module.exports = ProcessAssets;
+export default ProcessAssets;

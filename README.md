@@ -1,5 +1,8 @@
 # Eleventy Template asset pipeline plugin
 
+[![Tests](https://github.com/stephen-cox/eleventy-template-asset-pipeline/actions/workflows/test.yml/badge.svg)](https://github.com/stephen-cox/eleventy-template-asset-pipeline/actions/workflows/test.yml)
+[![npm version](https://badge.fury.io/js/@src-dev%2Feleventy-template-asset-pipeline.svg)](https://www.npmjs.com/package/@src-dev/eleventy-template-asset-pipeline)
+
 Eleventy plugin to provide asset pipelines as part of the 11ty build process.
 
 This plugin uses [JavaScript templates](https://www.11ty.dev/docs/languages/javascript/) to run an asset pipeline that can be used to process things like CSS and SASS as well as JavaScript and other static assets.

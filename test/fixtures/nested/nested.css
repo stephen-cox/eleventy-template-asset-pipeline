@@ -1,0 +1,4 @@
+/* Nested CSS file to test that only top-level files are processed */
+.nested {
+  color: red;
+}
