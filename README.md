@@ -35,7 +35,8 @@ You can also import specific modules directly:
 import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
 
 // CommonJS (only in .cjs files or projects without "type": "module")
-const ProcessAssets = await require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+// The require() returns a Promise, so use .then()
+const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
 ```
 
 **Shortcodes:**
@@ -45,33 +46,64 @@ import assetLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/
 import scriptLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink';
 
 // CommonJS (only in .cjs files or projects without "type": "module")
-const assetLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink');
-const scriptLink = await require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink');
+// The require() returns a Promise, so use .then()
+const assetLinkPromise = require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink');
+const scriptLinkPromise = require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink');
 ```
 
 **Important Notes:**
 - `require()` **only works in actual CommonJS files** (`.cjs` extension or projects without `"type": "module"` in package.json)
 - If you're using `.js` files in a project with `"type": "module"`, you **must use ESM `import` syntax**
-- When using `require()` for individual modules, you must `await` the result as they return Promises
+- When using `require()` for individual modules, it returns a **Promise** - you cannot use `await` at the top level of CommonJS files
+- Use `.then()` to handle the Promise or export a Promise from your module (see examples below)
 
 ### File Extension Guide for 11ty Templates
 
 When creating 11ty template files that use ProcessAssets:
 
-**If your project has `"type": "module"` in package.json:**
-- Use `.11ty.js` extension with ESM `import` syntax
-- Example: `_styles.11ty.js`
+**ESM (Recommended) - Use `.11ty.js` extension:**
 ```js
+// _styles.11ty.js
 import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
-export default new ProcessAssets({ /* config */ });
+
+async function processFile(file, production) {
+  // Your CSS/JS processing logic here
+  return processedContent;
+}
+
+export default new ProcessAssets({
+  inExtension: 'css',
+  inDirectory: './_assets/css',
+  outExtension: 'css',
+  outDirectory: '_assets/css',
+  collection: '_styles',
+  processFile: processFile,
+  production: process.env.ELEVENTY_ENV === 'production',
+});
 ```
 
-**If you want to use CommonJS:**
-- Use `.11ty.cjs` extension with `require()` syntax
-- Example: `_styles.11ty.cjs`
+**CommonJS - Use `.11ty.cjs` extension:**
 ```js
+// _styles.11ty.cjs
 const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
-module.exports = ProcessAssetsPromise.then(PA => new PA({ /* config */ }));
+
+async function processFile(file, production) {
+  // Your CSS/JS processing logic here
+  return processedContent;
+}
+
+// Export a Promise that resolves to the ProcessAssets instance
+module.exports = ProcessAssetsPromise.then(ProcessAssets => {
+  return new ProcessAssets({
+    inExtension: 'css',
+    inDirectory: './_assets/css',
+    outExtension: 'css',
+    outDirectory: '_assets/css',
+    collection: '_styles',
+    processFile: processFile,
+    production: process.env.ELEVENTY_ENV === 'production',
+  });
+});
 ```
 
 ## Using the virtual templates
