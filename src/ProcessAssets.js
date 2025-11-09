@@ -20,6 +20,7 @@ function sanitizePath(filePath, paramName = 'path') {
     throw new TypeError(`${paramName} must be a string, received ${typeof filePath}`);
   }
 
+  // Normalize for validation purposes (check for ..)
   const normalized = path.normalize(filePath);
 
   // Check for directory traversal attempts
@@ -31,7 +32,9 @@ function sanitizePath(filePath, paramName = 'path') {
     );
   }
 
-  return normalized;
+  // Return original path to preserve format for glob patterns
+  // glob library expects forward slashes even on Windows
+  return filePath;
 }
 
 
