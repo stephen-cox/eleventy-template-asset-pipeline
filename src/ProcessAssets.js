@@ -198,29 +198,31 @@ class ProcessAssets {
     }
 
     try {
-      // Find all style files in top-level directory.
-      const globPattern = `${this.inDirectory}/*.${this.inExtension}`;
-      let matchedFiles;
+      // Process each directory in inDirectory array
+      for (const directory of this.inDirectory) {
+        // Find all files in top-level directory.
+        const globPattern = `${directory}/*.${this.inExtension}`;
+        let matchedFiles;
 
-      try {
-        matchedFiles = await glob(globPattern);
-      } catch (error) {
-        throw new Error(
-          `Failed to search for files matching pattern "${globPattern}". ` +
-          `Error: ${error.message}. ` +
-          `Check that the inDirectory path is valid and accessible.`
-        );
-      }
+        try {
+          matchedFiles = await glob(globPattern);
+        } catch (error) {
+          throw new Error(
+            `Failed to search for files matching pattern "${globPattern}". ` +
+            `Error: ${error.message}. ` +
+            `Check that the inDirectory path is valid and accessible.`
+          );
+        }
 
-      if (matchedFiles.length === 0) {
-        // This is not necessarily an error - directory might be empty
-        console.warn(
-          `No files found matching pattern "${globPattern}". ` +
-          `This may be expected if your ${this.inExtension} directory is empty.`
-        );
-      }
+        if (matchedFiles.length === 0) {
+          // This is not necessarily an error - directory might be empty
+          console.warn(
+            `No files found matching pattern "${globPattern}". ` +
+            `This may be expected if your ${this.inExtension} directory is empty.`
+          );
+        }
 
-      for (const file of matchedFiles) {
+        for (const file of matchedFiles) {
         // Don't process 11ty JS template files.
         if (file.endsWith('.11ty.js')) {
           continue;
@@ -290,6 +292,7 @@ class ProcessAssets {
             `Error processing file "${file}": ${error.message}`
           );
         }
+      }
       }
     } catch (error) {
       // Re-throw with ProcessAssets context if not already wrapped
