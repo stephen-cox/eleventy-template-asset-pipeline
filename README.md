@@ -335,3 +335,129 @@ module.exports = ProcessAssetsPromise.then(ProcessAssets => new ProcessAssets({
   production: process.env.ELEVENTY_ENV === 'production' || process.env.ELEVENTY_ENV === 'stage',
 }));
 ```
+
+## Error Handling
+
+The plugin includes comprehensive error handling and input validation to help identify configuration issues and provide helpful error messages.
+
+### Configuration Validation
+
+The plugin validates all configuration parameters and provides descriptive error messages when issues are detected:
+
+```js
+// Example: Missing required parameters
+eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+  styles: {
+    enabled: true,
+    inDirectory: './_assets/css',
+    // Missing: inExtension, outDirectory, outExtension
+  }
+});
+// Error: Missing required configuration parameters: inExtension, outDirectory, outExtension.
+// ProcessAssets requires: inDirectory, inExtension, outDirectory, outExtension.
+// Example: { inDirectory: "./_assets/css", inExtension: "css", outDirectory: "_assets/css", outExtension: "css" }
+```
+
+### Path Sanitization
+
+The plugin automatically sanitizes file paths to prevent directory traversal attacks:
+
+```js
+// Example: Directory traversal attempt
+new ProcessAssets({
+  inDirectory: '../../../etc/passwd',  // This will throw an error
+  inExtension: 'css',
+  outDirectory: '_assets/css',
+  outExtension: 'css',
+});
+// Error: Invalid config.inDirectory: Directory traversal not allowed.
+// Path "../../../etc/passwd" contains ".." after normalization.
+// Use absolute paths or paths relative to your project root.
+```
+
+### ProcessFile Validation
+
+The plugin ensures that the `processFile` function is properly defined and returns valid content:
+
+```js
+// Example: Missing processFile function
+const processor = new ProcessAssets({
+  inDirectory: './_assets/css',
+  inExtension: 'css',
+  outDirectory: '_assets/css',
+  outExtension: 'css',
+  // processFile is not defined
+});
+
+await processor.processDirectory();
+// Error: No processFile function configured.
+// Provide a processFile function in the configuration:
+// { processFile: async (filePath, isProduction) => { /* process and return content */ } }
+```
+
+### Shortcode Error Handling
+
+The shortcodes (`assetLink` and `scriptLink`) validate their inputs and provide helpful error messages:
+
+```js
+// Example: Asset not found
+{% assetLink collections._styles, 'nonexistent.css' %}
+// Warning: Asset "nonexistent.css" not found in collection.
+// Available keys: main.css, theme.css
+// Returns: '' (empty string)
+```
+
+For stricter error handling, you can enable the `throwOnMissing` option:
+
+```js
+// In your template
+{% assetLink collections._styles, 'nonexistent.css', {}, { throwOnMissing: true } %}
+// Error: Asset "nonexistent.css" not found in collection.
+// Available keys: main.css, theme.css
+```
+
+### Type Checking
+
+All function parameters are type-checked with helpful error messages:
+
+```js
+// Example: Invalid parameter type
+assetLink(123, 'main.css')
+// Error: assetLink collection must be an array or iterable, received number.
+// Pass a collection from Eleventy: assetLink(collections._styles, "main.css")
+```
+
+### File Processing Errors
+
+When file processing fails, the error includes context about which file failed and why:
+
+```js
+// Example: ProcessFile throws an error
+async function processFile(file, production) {
+  throw new Error('PostCSS compilation failed');
+}
+
+// During build:
+// Error: Failed to process file "./_assets/css/main.css".
+// Error: PostCSS compilation failed.
+// Check that the file exists and the processFile function is working correctly.
+```
+
+### Best Practices for Error Handling
+
+1. **Always provide all required configuration parameters** to avoid configuration errors
+2. **Use try-catch blocks** around your `processFile` function to provide meaningful error messages
+3. **Test your configuration** with a small subset of files first
+4. **Enable strict mode** (`throwOnMissing: true`) during development to catch missing assets early
+5. **Check the console** for warnings about missing assets or empty directories
+
+### Common Error Messages
+
+| Error Message | Cause | Solution |
+|---------------|-------|----------|
+| `Missing required configuration parameters` | Not all required config options provided | Add the missing parameters listed in the error |
+| `Directory traversal not allowed` | Path contains `..` | Use paths relative to your project root without `..` |
+| `processFile must be a function` | processFile is not defined or has wrong type | Define processFile as an async function |
+| `Asset not found in collection` | Referenced asset key doesn't exist | Check the asset filename and collection name |
+| `No processFile function configured` | ProcessAssets created without processFile | Add processFile to your configuration |
+| `Failed to process file` | Error occurred in processFile function | Check the underlying error message and fix your processing logic |

@@ -96,13 +96,18 @@ test('plugin - merges options with defaults', async t => {
   await eleventyTemplateAssetPipeline(config, {
     styles: {
       enabled: true,
+      inDirectory: './_assets/css',
+      inExtension: 'css',
+      outDirectory: '_assets/css',
+      outExtension: 'css',
       processFile: mockProcessFile,
-      // inExtension, inDirectory, etc. should use defaults
+      // production should use default (false)
     },
   });
 
   t.truthy(config.templates['styles.11ty.js']);
-  // If it doesn't throw, defaults were applied successfully
+  // Verify that defaults were applied for production
+  t.is(config.templates['styles.11ty.js'].production, false);
   t.pass();
 });
 
@@ -114,6 +119,10 @@ test('plugin - accepts custom collection names', async t => {
     styles: {
       enabled: true,
       collection: 'myCustomStyles',
+      inDirectory: './_assets/css',
+      inExtension: 'css',
+      outDirectory: '_assets/css',
+      outExtension: 'css',
       processFile: mockProcessFile,
     },
   });
@@ -130,6 +139,10 @@ test('plugin - collection filter works correctly', async t => {
     styles: {
       enabled: true,
       collection: '_styles',
+      inDirectory: './_assets/css',
+      inExtension: 'css',
+      outDirectory: '_assets/css',
+      outExtension: 'css',
       processFile: mockProcessFile,
     },
   });
@@ -158,6 +171,10 @@ test('plugin - production flag is passed through', async t => {
     styles: {
       enabled: true,
       production: true,
+      inDirectory: './_assets/css',
+      inExtension: 'css',
+      outDirectory: '_assets/css',
+      outExtension: 'css',
       processFile: mockProcessFile,
     },
   });
@@ -174,6 +191,10 @@ test('plugin - development flag is passed through', async t => {
     styles: {
       enabled: true,
       production: false,
+      inDirectory: './_assets/css',
+      inExtension: 'css',
+      outDirectory: '_assets/css',
+      outExtension: 'css',
       processFile: mockProcessFile,
     },
   });
