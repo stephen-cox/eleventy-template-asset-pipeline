@@ -3,6 +3,6 @@
  */
 
 module.exports = (async () => {
-  const { default: ProcessAssets } = await import('./ProcessAssets.js');
-  return ProcessAssets;
+	const { default: ProcessAssets } = await import("./ProcessAssets.js");
+	return ProcessAssets;
 })();

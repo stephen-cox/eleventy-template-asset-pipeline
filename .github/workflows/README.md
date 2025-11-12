@@ -5,29 +5,34 @@ This directory contains GitHub Actions workflows for continuous integration and 
 ## test.yml
 
 ### Purpose
+
 Automatically runs the test suite on every push and pull request to ensure code quality and prevent regressions.
 
 ### Triggers
+
 - **Push** to `main` or `develop` branches
 - **Pull Requests** targeting `main` or `develop` branches
 
 ### Test Matrix
+
 Tests are run across multiple environments to ensure compatibility:
 
-| Node.js Version | Operating Systems |
-|----------------|-------------------|
-| 18.x (LTS)     | Ubuntu, Windows, macOS |
-| 20.x (LTS)     | Ubuntu, Windows, macOS |
-| 22.x (Current) | Ubuntu, Windows, macOS |
+| Node.js Version | Operating Systems      |
+| --------------- | ---------------------- |
+| 18.x (LTS)      | Ubuntu, Windows, macOS |
+| 20.x (LTS)      | Ubuntu, Windows, macOS |
+| 22.x (Current)  | Ubuntu, Windows, macOS |
 
 **Total:** 9 test combinations (3 Node versions × 3 operating systems)
 
 ### Jobs
 
 #### 1. Test Job
+
 Runs the AVA test suite across the matrix of Node.js versions and operating systems.
 
 **Steps:**
+
 1. Checkout the repository code
 2. Setup Node.js with the specified version
 3. Install dependencies using `npm ci` (clean install)
@@ -35,14 +40,17 @@ Runs the AVA test suite across the matrix of Node.js versions and operating syst
 5. Upload test artifacts (Ubuntu + Node 20 only)
 
 **Why these Node versions?**
+
 - **18.x:** Current LTS, widely used in production
 - **20.x:** Active LTS, recommended for most users
 - **22.x:** Current release, ensures future compatibility
 
 #### 2. Lint Job
+
 Prepared for future ESLint integration (currently commented out).
 
 **Steps:**
+
 1. Checkout the repository code
 2. Setup Node.js 20.x
 3. Install dependencies
@@ -57,6 +65,7 @@ The README.md displays a status badge showing the current test status:
 ```
 
 The badge shows:
+
 - ✅ **Passing** - All tests passed on all platforms
 - ❌ **Failing** - One or more tests failed
 - 🟡 **Running** - Tests currently executing
@@ -64,12 +73,15 @@ The badge shows:
 ### Configuration Options
 
 #### fail-fast: false
+
 Tests continue running on other platforms even if one fails. This helps identify platform-specific issues.
 
 #### cache: 'npm'
+
 Node.js setup caches npm dependencies to speed up subsequent runs.
 
 #### npm ci vs npm install
+
 Uses `npm ci` for clean, reproducible installs based on package-lock.json.
 
 ### Viewing Results
@@ -103,16 +115,18 @@ npx ava test/ProcessAssets.test.js
 To add ESLint when ready:
 
 1. Install ESLint:
+
    ```bash
    npm install --save-dev eslint
    ```
 
 2. Add lint script to package.json:
+
    ```json
    {
-     "scripts": {
-       "lint": "eslint ."
-     }
+   	"scripts": {
+   		"lint": "eslint ."
+   	}
    }
    ```
 
@@ -121,16 +135,19 @@ To add ESLint when ready:
 ### Troubleshooting
 
 #### Tests fail on Windows but pass on Linux/macOS
+
 - Check for path separator issues (`/` vs `\`)
 - Use `path.join()` or `path.resolve()` for cross-platform paths
 - Verify line endings (CRLF vs LF)
 
 #### Tests fail on specific Node versions
+
 - Check for Node.js API changes between versions
 - Review the changelog for breaking changes
 - Consider using feature detection instead of version checks
 
 #### Workflow not running
+
 - Verify branch names match the trigger configuration
 - Check repository settings → Actions → General
 - Ensure workflows are enabled for the repository
@@ -152,6 +169,7 @@ To add ESLint when ready:
 ## Future Workflows
 
 Consider adding:
+
 - **publish.yml** - Automated npm publishing on release
 - **codeql.yml** - Code security scanning
 - **coverage.yml** - Code coverage reporting

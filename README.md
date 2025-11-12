@@ -16,13 +16,15 @@ This package is published as an ES Module but includes full CommonJS interoperab
 ### Main Entry Point
 
 **ESM:**
+
 ```js
-import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
+import eleventyTemplateAssetPipeline from "@src-dev/eleventy-template-asset-pipeline";
 ```
 
 **CommonJS:**
+
 ```js
-const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
+const eleventyTemplateAssetPipeline = require("@src-dev/eleventy-template-asset-pipeline");
 ```
 
 ### Importing Individual Modules
@@ -30,28 +32,31 @@ const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-
 You can also import specific modules directly:
 
 **ProcessAssets Class:**
+
 ```js
 // ESM (.js files or imports)
-import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
+import ProcessAssets from "@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets";
 
 // CommonJS (only in .cjs files or projects without "type": "module")
 // The require() returns a Promise, so use .then()
-const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+const ProcessAssetsPromise = require("@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets");
 ```
 
 **Shortcodes:**
+
 ```js
 // ESM (.js files or imports)
-import assetLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink';
-import scriptLink from '@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink';
+import assetLink from "@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink";
+import scriptLink from "@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink";
 
 // CommonJS (only in .cjs files or projects without "type": "module")
 // The require() returns a Promise, so use .then()
-const assetLinkPromise = require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink');
-const scriptLinkPromise = require('@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink');
+const assetLinkPromise = require("@src-dev/eleventy-template-asset-pipeline/src/shortcodes/assetLink");
+const scriptLinkPromise = require("@src-dev/eleventy-template-asset-pipeline/src/shortcodes/scriptLink");
 ```
 
 **Important Notes:**
+
 - `require()` **only works in actual CommonJS files** (`.cjs` extension or projects without `"type": "module"` in package.json)
 - If you're using `.js` files in a project with `"type": "module"`, you **must use ESM `import` syntax**
 - When using `require()` for individual modules, it returns a **Promise** - you cannot use `await` at the top level of CommonJS files
@@ -62,47 +67,49 @@ const scriptLinkPromise = require('@src-dev/eleventy-template-asset-pipeline/src
 When creating 11ty template files that use ProcessAssets:
 
 **ESM (Recommended) - Use `.11ty.js` extension:**
+
 ```js
 // _styles.11ty.js
-import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
+import ProcessAssets from "@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets";
 
 async function processFile(file, production) {
-  // Your CSS/JS processing logic here
-  return processedContent;
+	// Your CSS/JS processing logic here
+	return processedContent;
 }
 
 export default new ProcessAssets({
-  inExtension: 'css',
-  inDirectory: './_assets/css',
-  outExtension: 'css',
-  outDirectory: '_assets/css',
-  collection: '_styles',
-  processFile: processFile,
-  production: process.env.ELEVENTY_ENV === 'production',
+	inExtension: "css",
+	inDirectory: "./_assets/css",
+	outExtension: "css",
+	outDirectory: "_assets/css",
+	collection: "_styles",
+	processFile: processFile,
+	production: process.env.ELEVENTY_ENV === "production",
 });
 ```
 
 **CommonJS - Use `.11ty.cjs` extension:**
+
 ```js
 // _styles.11ty.cjs
-const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
+const ProcessAssetsPromise = require("@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets");
 
 async function processFile(file, production) {
-  // Your CSS/JS processing logic here
-  return processedContent;
+	// Your CSS/JS processing logic here
+	return processedContent;
 }
 
 // Export a Promise that resolves to the ProcessAssets instance
-module.exports = ProcessAssetsPromise.then(ProcessAssets => {
-  return new ProcessAssets({
-    inExtension: 'css',
-    inDirectory: './_assets/css',
-    outExtension: 'css',
-    outDirectory: '_assets/css',
-    collection: '_styles',
-    processFile: processFile,
-    production: process.env.ELEVENTY_ENV === 'production',
-  });
+module.exports = ProcessAssetsPromise.then((ProcessAssets) => {
+	return new ProcessAssets({
+		inExtension: "css",
+		inDirectory: "./_assets/css",
+		outExtension: "css",
+		outDirectory: "_assets/css",
+		collection: "_styles",
+		processFile: processFile,
+		production: process.env.ELEVENTY_ENV === "production",
+	});
 });
 ```
 
@@ -116,72 +123,73 @@ For example to process styles using PostCSS, define the processFile function.
 /**
  * Process CSS files using PostCSS.
  */
-const processFilePostCss = async function(file, production) {
-  const css = await fs.readFileSync(file);
+const processFilePostCss = async function (file, production) {
+	const css = await fs.readFileSync(file);
 
-  // Production build.
-  if (production) {
-    return await postcss([
-        require('postcss-import'),
-        require('autoprefixer'),
-        require('postcss-custom-media'),
-        require('cssnano')({
-            preset: 'default',
-        }),
-      ]).process(css, { from: file })
-      .then(result => result.css);
-  }
+	// Production build.
+	if (production) {
+		return await postcss([
+			require("postcss-import"),
+			require("autoprefixer"),
+			require("postcss-custom-media"),
+			require("cssnano")({
+				preset: "default",
+			}),
+		])
+			.process(css, { from: file })
+			.then((result) => result.css);
+	}
 
-  // Development build.
-  else {
-    return await postcss([
-        require('postcss-import'),
-        require('autoprefixer'),
-      ]).process(css, { from: file })
-      .then(result => result.css);
-  }
-}
+	// Development build.
+	else {
+		return await postcss([require("postcss-import"), require("autoprefixer")])
+			.process(css, { from: file })
+			.then((result) => result.css);
+	}
+};
 ```
 
 Then configure the plugin to use this plugin to process CSS files in a directory. Using the postcss-import plugin gives the ability to process a single file that loads all your CSS files in subdirectories.
 
 **ESM (ES Modules):**
-```js
-import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
 
-export default function(eleventyConfig) {
-  eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
-    styles: {
-      enabled: true,
-      collection: '_styles',
-      inExtension: 'css',
-      inDirectory: '_assets/css',
-      outExtension: 'css',
-      outDirectory: '_assets/css',
-      processFile: processFilePostCss,
-      production: process.env.ELEVENTY_ENV === 'production',
-    }
-  });
+```js
+import eleventyTemplateAssetPipeline from "@src-dev/eleventy-template-asset-pipeline";
+
+export default function (eleventyConfig) {
+	eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+		styles: {
+			enabled: true,
+			collection: "_styles",
+			inExtension: "css",
+			inDirectory: "_assets/css",
+			outExtension: "css",
+			outDirectory: "_assets/css",
+			processFile: processFilePostCss,
+			production: process.env.ELEVENTY_ENV === "production",
+		},
+	});
 }
 ```
 
 **CommonJS:**
-```js
-const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
 
-module.exports = async function(eleventyConfig) {
-  await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
-    styles: {
-      enabled: true,
-      collection: '_styles',
-      inExtension: 'css',
-      inDirectory: '_assets/css',
-      outExtension: 'css',
-      outDirectory: '_assets/css',
-      processFile: processFilePostCss,
-      production: process.env.ELEVENTY_ENV === 'production',
-    }
-  });
+```js
+const eleventyTemplateAssetPipeline = require("@src-dev/eleventy-template-asset-pipeline");
+
+module.exports = async function (eleventyConfig) {
+	await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+		styles: {
+			enabled: true,
+			collection: "_styles",
+			inExtension: "css",
+			inDirectory: "_assets/css",
+			outExtension: "css",
+			outDirectory: "_assets/css",
+			processFile: processFilePostCss,
+			production: process.env.ELEVENTY_ENV === "production",
+		},
+	});
 };
 ```
 
@@ -190,20 +198,22 @@ module.exports = async function(eleventyConfig) {
 It's possible to create the JavaScript templates directly, rather than relying on the virtual templates. To do this initialise the plugin in the 11ty config file with no extra settings.
 
 **ESM (ES Modules):**
-```js
-import eleventyTemplateAssetPipeline from '@src-dev/eleventy-template-asset-pipeline';
 
-export default function(eleventyConfig) {
-  eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
+```js
+import eleventyTemplateAssetPipeline from "@src-dev/eleventy-template-asset-pipeline";
+
+export default function (eleventyConfig) {
+	eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
 }
 ```
 
 **CommonJS:**
-```js
-const eleventyTemplateAssetPipeline = require('@src-dev/eleventy-template-asset-pipeline');
 
-module.exports = async function(eleventyConfig) {
-  await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
+```js
+const eleventyTemplateAssetPipeline = require("@src-dev/eleventy-template-asset-pipeline");
+
+module.exports = async function (eleventyConfig) {
+	await eleventyConfig.addPlugin(eleventyTemplateAssetPipeline);
 };
 ```
 
@@ -211,129 +221,140 @@ Then in the directory containing files to process (e.g. your CSS or JavaScript f
 
 To process JavaScript files using Webpack, you would create a `_scripts.11ty.js` file in the root of you scripts directory.
 
-**ESM (_scripts.11ty.js):**
+**ESM (\_scripts.11ty.js):**
+
 ```js
 /**
  * Process JavaScript files using the ProcessAssets class.
  */
 
-import fs from 'fs';
-import path from 'path';
-import webpack from 'webpack';
-import { fs as mfs } from 'memfs';
-import ProcessAssets from '@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets';
-
+import fs from "fs";
+import path from "path";
+import webpack from "webpack";
+import { fs as mfs } from "memfs";
+import ProcessAssets from "@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets";
 
 /**
  * Process JS files.
  */
 async function processFile(file) {
-  const production = process.env.ELEVENTY_ENV;
+	const production = process.env.ELEVENTY_ENV;
 
-  // Setup Webpack.
-  const webpackConfig = {
-    mode: production ? 'production' : 'development',
-    entry: file,
-    output: {
-      filename: path.basename(file),
-      path: path.resolve('/'),
-    },
-  };
-  const compiler = webpack(webpackConfig);
-  compiler.outputFileSystem = mfs;
-  compiler.inputFileSystem = fs;
-  compiler.intermediateFileSystem = mfs;
+	// Setup Webpack.
+	const webpackConfig = {
+		mode: production ? "production" : "development",
+		entry: file,
+		output: {
+			filename: path.basename(file),
+			path: path.resolve("/"),
+		},
+	};
+	const compiler = webpack(webpackConfig);
+	compiler.outputFileSystem = mfs;
+	compiler.inputFileSystem = fs;
+	compiler.intermediateFileSystem = mfs;
 
-  // Compile file.
-  return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err || stats.hasErrors()) {
-        const errors = err || (stats.compilation ? stats.compilation.errors : null);
-        reject(errors);
-        return;
-      }
+	// Compile file.
+	return new Promise((resolve, reject) => {
+		compiler.run((err, stats) => {
+			if (err || stats.hasErrors()) {
+				const errors = err || (stats.compilation ? stats.compilation.errors : null);
+				reject(errors);
+				return;
+			}
 
-      mfs.readFile(webpackConfig.output.path + '/' + webpackConfig.output.filename, 'utf8', (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
-  });
+			mfs.readFile(
+				webpackConfig.output.path + "/" + webpackConfig.output.filename,
+				"utf8",
+				(err, data) => {
+					if (err) reject(err);
+					else resolve(data);
+				},
+			);
+		});
+	});
 }
 
 export default new ProcessAssets({
-  inExtension: 'js',
-  inDirectory: import.meta.dirname,
-  outExtension: 'js',
-  outDirectory: '_assets/js',
-  collection: '_scripts',
-  processFile: processFile,
-  production: process.env.ELEVENTY_ENV === 'production' || process.env.ELEVENTY_ENV === 'stage',
+	inExtension: "js",
+	inDirectory: import.meta.dirname,
+	outExtension: "js",
+	outDirectory: "_assets/js",
+	collection: "_scripts",
+	processFile: processFile,
+	production: process.env.ELEVENTY_ENV === "production" || process.env.ELEVENTY_ENV === "stage",
 });
 ```
 
-**CommonJS (_scripts.11ty.cjs):**
+**CommonJS (\_scripts.11ty.cjs):**
+
 ```js
 /**
  * Process JavaScript files using the ProcessAssets class.
  */
 
-const fs = require('fs');
-const path = require('path');
-const webpack = require('webpack');
-const { fs: mfs } = require('memfs');
+const fs = require("fs");
+const path = require("path");
+const webpack = require("webpack");
+const { fs: mfs } = require("memfs");
 
 // Note: await the require() for individual modules
-const ProcessAssetsPromise = require('@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets');
-
+const ProcessAssetsPromise = require("@src-dev/eleventy-template-asset-pipeline/src/ProcessAssets");
 
 /**
  * Process JS files.
  */
 async function processFile(file) {
-  const production = process.env.ELEVENTY_ENV;
+	const production = process.env.ELEVENTY_ENV;
 
-  // Setup Webpack.
-  const webpackConfig = {
-    mode: production ? 'production' : 'development',
-    entry: file,
-    output: {
-      filename: path.basename(file),
-      path: path.resolve('/'),
-    },
-  };
-  const compiler = webpack(webpackConfig);
-  compiler.outputFileSystem = mfs;
-  compiler.inputFileSystem = fs;
-  compiler.intermediateFileSystem = mfs;
+	// Setup Webpack.
+	const webpackConfig = {
+		mode: production ? "production" : "development",
+		entry: file,
+		output: {
+			filename: path.basename(file),
+			path: path.resolve("/"),
+		},
+	};
+	const compiler = webpack(webpackConfig);
+	compiler.outputFileSystem = mfs;
+	compiler.inputFileSystem = fs;
+	compiler.intermediateFileSystem = mfs;
 
-  // Compile file.
-  return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err || stats.hasErrors()) {
-        const errors = err || (stats.compilation ? stats.compilation.errors : null);
-        reject(errors);
-        return;
-      }
+	// Compile file.
+	return new Promise((resolve, reject) => {
+		compiler.run((err, stats) => {
+			if (err || stats.hasErrors()) {
+				const errors = err || (stats.compilation ? stats.compilation.errors : null);
+				reject(errors);
+				return;
+			}
 
-      mfs.readFile(webpackConfig.output.path + '/' + webpackConfig.output.filename, 'utf8', (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
-  });
+			mfs.readFile(
+				webpackConfig.output.path + "/" + webpackConfig.output.filename,
+				"utf8",
+				(err, data) => {
+					if (err) reject(err);
+					else resolve(data);
+				},
+			);
+		});
+	});
 }
 
 // Await the ProcessAssets class and create instance
-module.exports = ProcessAssetsPromise.then(ProcessAssets => new ProcessAssets({
-  inExtension: 'js',
-  inDirectory: __dirname,
-  outExtension: 'js',
-  outDirectory: '_assets/js',
-  collection: '_scripts',
-  processFile: processFile,
-  production: process.env.ELEVENTY_ENV === 'production' || process.env.ELEVENTY_ENV === 'stage',
-}));
+module.exports = ProcessAssetsPromise.then(
+	(ProcessAssets) =>
+		new ProcessAssets({
+			inExtension: "js",
+			inDirectory: __dirname,
+			outExtension: "js",
+			outDirectory: "_assets/js",
+			collection: "_scripts",
+			processFile: processFile,
+			production: process.env.ELEVENTY_ENV === "production" || process.env.ELEVENTY_ENV === "stage",
+		}),
+);
 ```
 
 ## Error Handling
@@ -347,11 +368,11 @@ The plugin validates all configuration parameters and provides descriptive error
 ```js
 // Example: Missing required parameters
 eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
-  styles: {
-    enabled: true,
-    inDirectory: './_assets/css',
-    // Missing: inExtension, outDirectory, outExtension
-  }
+	styles: {
+		enabled: true,
+		inDirectory: "./_assets/css",
+		// Missing: inExtension, outDirectory, outExtension
+	},
 });
 // Error: Missing required configuration parameters: inExtension, outDirectory, outExtension.
 // ProcessAssets requires: inDirectory, inExtension, outDirectory, outExtension.
@@ -365,10 +386,10 @@ The plugin automatically sanitizes file paths to prevent directory traversal att
 ```js
 // Example: Directory traversal attempt
 new ProcessAssets({
-  inDirectory: '../../../etc/passwd',  // This will throw an error
-  inExtension: 'css',
-  outDirectory: '_assets/css',
-  outExtension: 'css',
+	inDirectory: "../../../etc/passwd", // This will throw an error
+	inExtension: "css",
+	outDirectory: "_assets/css",
+	outExtension: "css",
 });
 // Error: Invalid config.inDirectory: Directory traversal not allowed.
 // Path "../../../etc/passwd" contains ".." after normalization.
@@ -382,11 +403,11 @@ The plugin ensures that the `processFile` function is properly defined and retur
 ```js
 // Example: Missing processFile function
 const processor = new ProcessAssets({
-  inDirectory: './_assets/css',
-  inExtension: 'css',
-  outDirectory: '_assets/css',
-  outExtension: 'css',
-  // processFile is not defined
+	inDirectory: "./_assets/css",
+	inExtension: "css",
+	outDirectory: "_assets/css",
+	outExtension: "css",
+	// processFile is not defined
 });
 
 await processor.processDirectory();
@@ -422,7 +443,7 @@ All function parameters are type-checked with helpful error messages:
 
 ```js
 // Example: Invalid parameter type
-assetLink(123, 'main.css')
+assetLink(123, "main.css");
 // Error: assetLink collection must be an array or iterable, received number.
 // Pass a collection from Eleventy: assetLink(collections._styles, "main.css")
 ```
@@ -434,7 +455,7 @@ When file processing fails, the error includes context about which file failed a
 ```js
 // Example: ProcessFile throws an error
 async function processFile(file, production) {
-  throw new Error('PostCSS compilation failed');
+	throw new Error("PostCSS compilation failed");
 }
 
 // During build:
@@ -453,11 +474,11 @@ async function processFile(file, production) {
 
 ### Common Error Messages
 
-| Error Message | Cause | Solution |
-|---------------|-------|----------|
-| `Missing required configuration parameters` | Not all required config options provided | Add the missing parameters listed in the error |
-| `Directory traversal not allowed` | Path contains `..` | Use paths relative to your project root without `..` |
-| `processFile must be a function` | processFile is not defined or has wrong type | Define processFile as an async function |
-| `Asset not found in collection` | Referenced asset key doesn't exist | Check the asset filename and collection name |
-| `No processFile function configured` | ProcessAssets created without processFile | Add processFile to your configuration |
-| `Failed to process file` | Error occurred in processFile function | Check the underlying error message and fix your processing logic |
+| Error Message                               | Cause                                        | Solution                                                         |
+| ------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| `Missing required configuration parameters` | Not all required config options provided     | Add the missing parameters listed in the error                   |
+| `Directory traversal not allowed`           | Path contains `..`                           | Use paths relative to your project root without `..`             |
+| `processFile must be a function`            | processFile is not defined or has wrong type | Define processFile as an async function                          |
+| `Asset not found in collection`             | Referenced asset key doesn't exist           | Check the asset filename and collection name                     |
+| `No processFile function configured`        | ProcessAssets created without processFile    | Add processFile to your configuration                            |
+| `Failed to process file`                    | Error occurred in processFile function       | Check the underlying error message and fix your processing logic |
