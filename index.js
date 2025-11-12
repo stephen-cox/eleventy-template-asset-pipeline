@@ -29,6 +29,20 @@ const defaultOptions = {
   }
 };
 
+/**
+ * Creates a collection filter function for asset collections.
+ *
+ * @param {string} collectionName - The name of the collection to filter for.
+ * @returns {function} A function that filters collections for assets matching the collection name.
+ */
+function createAssetCollectionFilter(collectionName) {
+  return function (collectionsApi) {
+    return collectionsApi.getAll().filter(function (item) {
+      return 'asset' in item.data && item.data.asset.includes(collectionName);
+    });
+  };
+}
+
 async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {}) {
   // Validate eleventyConfig parameter
   if (!eleventyConfig || typeof eleventyConfig !== 'object') {
@@ -70,11 +84,10 @@ async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {})
   if (options.styles.enabled) {
     try {
       eleventyConfig.addTemplate('styles.11ty.js', new ProcessAssets(options.styles));
-      eleventyConfig.addCollection(options.styles.collection, function (collectionsApi) {
-        return collectionsApi.getAll().filter(function (item) {
-          return 'asset' in item.data && item.data.asset.includes(options.styles.collection);
-        });
-      });
+      eleventyConfig.addCollection(
+        options.styles.collection,
+        createAssetCollectionFilter(options.styles.collection)
+      );
     } catch (error) {
       throw new Error(
         `Failed to initialize styles processing: ${error.message}. ` +
@@ -85,11 +98,10 @@ async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {})
   if (options.scripts.enabled) {
     try {
       eleventyConfig.addTemplate('scripts.11ty.js', new ProcessAssets(options.scripts));
-      eleventyConfig.addCollection(options.scripts.collection, function (collectionsApi) {
-        return collectionsApi.getAll().filter(function (item) {
-          return 'asset' in item.data && item.data.asset.includes(options.scripts.collection);
-        });
-      });
+      eleventyConfig.addCollection(
+        options.scripts.collection,
+        createAssetCollectionFilter(options.scripts.collection)
+      );
     } catch (error) {
       throw new Error(
         `Failed to initialize scripts processing: ${error.message}. ` +
