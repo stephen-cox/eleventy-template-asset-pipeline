@@ -1,0 +1,45 @@
+# Test files
+test/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+
+# CI/CD
+.github/
+.git/
+.gitignore
+
+# Development tools config
+.eslintrc*
+eslint.config.js
+.prettierrc*
+.prettierignore
+ava.config.js
+.editorconfig
+
+# Documentation for maintainers
+claude.md
+
+# Source control
+.git
+.gitattributes
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+.cache/

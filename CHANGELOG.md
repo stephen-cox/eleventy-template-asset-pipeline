@@ -17,75 +17,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Browser compatibility information
 - Comparison with alternative solutions
 
-## [0.2.1] - 2024
+## [0.2.2] - 2025-11-12
 
 ### Added
 
-- TypeScript type definitions for enhanced IDE support
-- Dual package exports for CommonJS and ES modules
-- Comprehensive module support documentation
+- Automated NPM publishing workflow for streamlined releases
+- TypeScript type definitions for enhanced IDE support and type safety
+- ESLint for JavaScript linting with Eleventy core style configuration
+- Prettier for code formatting matching Eleventy style guidelines
+- Comprehensive linting and formatting checks in CI pipeline
 
 ### Changed
 
-- Improved documentation with detailed module import examples
-- Enhanced file extension guide for Eleventy templates
+- Updated development documentation with mandatory linting and formatting requirements
+- Refactored collection filter logic to reduce code duplication (Issue #3)
 
 ### Fixed
 
-- Prettier formatting issues
-- Package-lock.json consistency
+- Prettier formatting issues across the codebase
+- Updated package-lock.json to reflect new development dependencies
 
-## [0.2.0] - 2024
+## [0.2.1] - 2025-11-11
 
 ### Added
 
-- Code quality improvements with ESLint and Prettier integration
-- Automated linting and formatting checks
-- Test coverage improvements
-- Comprehensive error handling and validation
-- Path sanitization to prevent directory traversal attacks
-- Input validation for all configuration parameters
-- Detailed error messages with helpful guidance
-
-### Changed
-
-- Improved error handling throughout the codebase
-- Enhanced type checking for function parameters
-- Better validation of ProcessAssets configuration
-- Improved shortcode error handling with optional strict mode
+- Comprehensive error handling and input validation (Issue #2)
 
 ### Fixed
 
-- Security vulnerabilities related to path handling
-- Various edge cases in error handling
+- Fixed sanitizePath to preserve path format for glob compatibility
+- Fixed ProcessAssets to properly iterate over inDirectory array
 
-## [0.1.0] - 2024
+## [0.2.0] - 2025-11-06
 
-### Added
+### Fixed
 
-- Initial release
-- ProcessAssets class for asset pipeline processing
-- Support for virtual templates (styles and scripts)
-- Cache busting with SHA-512 hashing in production mode
-- SRI (Subresource Integrity) hash generation
-- `assetLink` shortcode for stylesheet links
-- `scriptLink` shortcode for script tags
-- Development and production build modes
-- Support for PostCSS, Webpack, Sass, and other asset processors
-- Configurable input/output directories and file extensions
-- Collection-based asset organization
-- ES Module and CommonJS interoperability
+- Fixed error in cleaning up hash for cache busting
 
-### Features
+## Earlier Versions
 
-- Asset pipeline integration with Eleventy build process
-- Automatic hash-based cache busting
-- Integrity attribute generation for enhanced security
-- Flexible processFile function for custom asset processing
-- Support for multiple input directories
-- Automatic 11ty template file exclusion
+For earlier version history, please see the [commit history](https://github.com/stephen-cox/eleventy-template-asset-pipeline/commits/main).
 
-[Unreleased]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/releases/tag/v0.1.0
+[0.2.0]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/releases/tag/v0.2.0
