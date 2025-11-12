@@ -47,6 +47,15 @@ export default [
 		},
 	},
 	{
+		name: "eleventy-template-asset-pipeline/examples-browser",
+		files: ["examples/**/*.js"],
+		languageOptions: {
+			globals: {
+				...globals.browser,
+			},
+		},
+	},
+	{
 		name: "eleventy-template-asset-pipeline/setup/prettier",
 		...prettier,
 	},

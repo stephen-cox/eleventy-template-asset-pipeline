@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ title or "esbuild Example" }}</title>
+	<style>
+		:root {
+			--bg: #ffffff;
+			--text: #1f2937;
+			--primary: #3b82f6;
+			--secondary: #8b5cf6;
+			--card-bg: #ffffff;
+			--border: #e5e7eb;
+		}
+
+		[data-theme="dark"] {
+			--bg: #1f2937;
+			--text: #f9fafb;
+			--card-bg: #374151;
+			--border: #4b5563;
+		}
+
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			line-height: 1.6;
+			color: var(--text);
+			background: var(--bg);
+			transition: background-color 0.3s, color 0.3s;
+		}
+		.container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+		.header {
+			background: linear-gradient(135deg, var(--primary), var(--secondary));
+			color: white;
+			padding: 2rem 0;
+			margin-bottom: 2rem;
+		}
+		.header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+		.header p { opacity: 0.9; }
+		.card {
+			background: var(--card-bg);
+			border: 1px solid var(--border);
+			border-radius: 0.5rem;
+			padding: 1.5rem;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			transition: all 0.3s;
+		}
+		.card h3 { margin-bottom: 0.5rem; }
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1rem;
+			margin: 2rem 0;
+		}
+		.btn {
+			display: inline-block;
+			padding: 0.5rem 1rem;
+			background: var(--primary);
+			color: white;
+			border: none;
+			border-radius: 0.25rem;
+			cursor: pointer;
+			margin: 0.25rem;
+			font-size: 1rem;
+		}
+		.btn:hover { opacity: 0.9; }
+		.counter-display {
+			font-size: 3rem;
+			font-weight: bold;
+			color: var(--primary);
+			margin: 1rem 0;
+		}
+		.counter-display.updated {
+			animation: pulse 0.3s ease;
+		}
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.1); }
+		}
+		.text-center { text-align: center; }
+		.mt-2 { margin-top: 2rem; }
+		.badge {
+			display: inline-block;
+			padding: 0.25rem 0.5rem;
+			background: var(--secondary);
+			color: white;
+			border-radius: 0.25rem;
+			font-size: 0.875rem;
+			margin: 0.25rem;
+		}
+	</style>
+	{% scriptLink collections._scripts, 'app.js' %}
+</head>
+<body>
+	<header class="header">
+		<div class="container">
+			<h1>Eleventy + esbuild Example</h1>
+			<p>Lightning-fast JavaScript bundling</p>
+		</div>
+	</header>
+
+	<main class="container">
+		<div class="text-center mt-2">
+			<button id="theme-toggle" class="btn">🌙 Dark Mode</button>
+		</div>
+
+		{{ content | safe }}
+	</main>
+
+	<footer class="container text-center mt-2">
+		<p id="build-info"></p>
+		<p>&copy; 2024 esbuild Example</p>
+	</footer>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+	"name": "eleventy-esbuild-example",
+	"version": "1.0.0",
+	"description": "Example using Eleventy Template Asset Pipeline with esbuild",
+	"type": "module",
+	"scripts": {
+		"dev": "eleventy --serve",
+		"build": "ELEVENTY_ENV=production eleventy",
+		"clean": "rm -rf _site"
+	},
+	"dependencies": {
+		"@src-dev/eleventy-template-asset-pipeline": "^0.2.1",
+		"@11ty/eleventy": "^3.0.0",
+		"esbuild": "^0.20.0"
+	}
+}
