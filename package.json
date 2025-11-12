@@ -51,7 +51,10 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
     "ava": "^6.2.0",
-    "eslint": "^9.39.1"
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0"
   }
 }
