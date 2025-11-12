@@ -357,6 +357,56 @@ module.exports = ProcessAssetsPromise.then(
 );
 ```
 
+## Contributing and Releases
+
+### Development
+
+When contributing to this project:
+
+1. Fork the repository and create a feature branch
+2. Make your changes and ensure all tests pass: `npm test`
+3. Run linting: `npm run lint` (or `npm run lint:fix` to auto-fix)
+4. Check formatting: `npm run format:check` (or `npm run format` to auto-fix)
+5. Submit a pull request to the `main` branch
+
+### Publishing Releases
+
+This package uses automated NPM publishing via GitHub Actions. To publish a new version:
+
+1. **Update the version** in `package.json`:
+
+   ```bash
+   npm version patch  # For bug fixes (0.2.1 -> 0.2.2)
+   npm version minor  # For new features (0.2.1 -> 0.3.0)
+   npm version major  # For breaking changes (0.2.1 -> 1.0.0)
+   ```
+
+2. **Push the changes** to the main branch:
+
+   ```bash
+   git push origin main
+   ```
+
+3. **Create a GitHub Release**:
+   - Go to the [Releases page](https://github.com/stephen-cox/eleventy-template-asset-pipeline/releases)
+   - Click "Draft a new release"
+   - Create a new tag matching the version in `package.json` (e.g., `0.2.2`)
+   - Target the `main` branch
+   - Add release notes describing the changes
+   - Click "Publish release"
+
+4. **Automated Publishing**:
+   - GitHub Actions will automatically run tests and linting
+   - If all checks pass, the package will be published to NPM with provenance
+   - The workflow status can be monitored in the [Actions tab](https://github.com/stephen-cox/eleventy-template-asset-pipeline/actions)
+
+**Important Notes:**
+
+- Only releases from the `main` branch will be published to NPM
+- The version in `package.json` must match the release tag
+- All tests and linting must pass before publishing
+- NPM packages are published with provenance for supply chain security
+
 ## Error Handling
 
 The plugin includes comprehensive error handling and input validation to help identify configuration issues and provide helpful error messages.
