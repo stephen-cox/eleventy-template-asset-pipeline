@@ -42,13 +42,16 @@
   "homepage": "https://github.com/stephen-cox/eleventy-template-asset-pipeline#readme",
   "scripts": {
     "test": "ava",
-    "test:watch": "ava --watch"
+    "test:watch": "ava --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "glob": "^11.0.3"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "ava": "^6.2.0"
+    "ava": "^6.2.0",
+    "eslint": "^9.39.1"
   }
 }

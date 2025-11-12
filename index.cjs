@@ -4,6 +4,6 @@
  */
 
 module.exports = async function eleventyTemplateAssetPipeline(eleventyConfig, pluginOptions = {}) {
-  const { default: plugin } = await import('./index.js');
+  const { default: plugin } = await import("./index.js");
   return plugin(eleventyConfig, pluginOptions);
 };

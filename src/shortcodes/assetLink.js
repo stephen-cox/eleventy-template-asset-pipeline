@@ -12,7 +12,7 @@
  */
 const assetLink = function(collection, key, attributes = {}, options = {}) {
   // Support legacy 3-argument call where 3rd arg might have throwOnMissing
-  if (attributes && typeof attributes === 'object' && 'throwOnMissing' in attributes && Object.keys(attributes).length === 1) {
+  if (attributes && typeof attributes === "object" && "throwOnMissing" in attributes && Object.keys(attributes).length === 1) {
     options = attributes;
     attributes = {};
   }
@@ -20,19 +20,19 @@ const assetLink = function(collection, key, attributes = {}, options = {}) {
   // Validate collection parameter
   if (collection === undefined || collection === null) {
     const errorMsg =
-      'assetLink requires a collection as the first parameter. ' +
+      "assetLink requires a collection as the first parameter. " +
       'Usage: assetLink(collections._styles, "main.css"). ' +
-      'Make sure the collection is defined in your template.';
+      "Make sure the collection is defined in your template.";
 
     if (options.throwOnMissing) {
       throw new TypeError(errorMsg);
     }
     console.error(`[assetLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Validate that collection is iterable
-  if (!Array.isArray(collection) && typeof collection[Symbol.iterator] !== 'function') {
+  if (!Array.isArray(collection) && typeof collection[Symbol.iterator] !== "function") {
     const errorMsg =
       `assetLink collection must be an array or iterable, received ${typeof collection}. ` +
       'Pass a collection from Eleventy: assetLink(collections._styles, "main.css")';
@@ -41,11 +41,11 @@ const assetLink = function(collection, key, attributes = {}, options = {}) {
       throw new TypeError(errorMsg);
     }
     console.error(`[assetLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Validate key parameter
-  if (typeof key !== 'string') {
+  if (typeof key !== "string") {
     const errorMsg =
       `assetLink key must be a string, received ${typeof key}. ` +
       'Example: assetLink(collections._styles, "main.css")';
@@ -54,23 +54,23 @@ const assetLink = function(collection, key, attributes = {}, options = {}) {
       throw new TypeError(errorMsg);
     }
     console.error(`[assetLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
-  if (key.trim() === '') {
+  if (key.trim() === "") {
     const errorMsg =
-      'assetLink key cannot be empty. ' +
+      "assetLink key cannot be empty. " +
       'Provide the filename of the asset: assetLink(collections._styles, "main.css")';
 
     if (options.throwOnMissing) {
       throw new Error(errorMsg);
     }
     console.error(`[assetLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Validate attributes parameter
-  if (attributes !== null && typeof attributes !== 'object') {
+  if (attributes !== null && typeof attributes !== "object") {
     const errorMsg =
       `assetLink attributes must be an object, received ${typeof attributes}. ` +
       'Example: assetLink(collections._styles, "main.css", { media: "print" })';
@@ -79,47 +79,47 @@ const assetLink = function(collection, key, attributes = {}, options = {}) {
       throw new TypeError(errorMsg);
     }
     console.error(`[assetLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Set default rel attribute if not provided
-  if (!('rel' in attributes)) {
-    attributes.rel = 'stylesheet';
+  if (!("rel" in attributes)) {
+    attributes.rel = "stylesheet";
   }
 
   // Search for the asset in the collection
   for (let item of collection) {
     // Validate item structure
-    if (!item || typeof item !== 'object') {
+    if (!item || typeof item !== "object") {
       continue;
     }
 
-    if (!item.data || typeof item.data !== 'object') {
+    if (!item.data || typeof item.data !== "object") {
       continue;
     }
 
     if (item.data.key === key) {
       // Validate that item has a URL
-      if (!item.url || typeof item.url !== 'string') {
+      if (!item.url || typeof item.url !== "string") {
         const errorMsg =
           `Asset "${key}" found but has no valid URL. ` +
-          'This may indicate a problem with asset processing.';
+          "This may indicate a problem with asset processing.";
 
         if (options.throwOnMissing) {
           throw new Error(errorMsg);
         }
         console.error(`[assetLink Error] ${errorMsg}`);
-        return '';
+        return "";
       }
 
       // Add integrity and crossorigin if available
-      if ('integrity' in item.data && item.data.integrity != undefined) {
+      if ("integrity" in item.data && item.data.integrity != undefined) {
         attributes.integrity = item.data.integrity;
         attributes.crossorigin = "anonymous";
       }
 
       // Build attribute string
-      let attributeString = '';
+      let attributeString = "";
       for (let attribute in attributes) {
         attributeString += `${attribute}="${attributes[attribute]}" `;
       }
@@ -131,17 +131,17 @@ const assetLink = function(collection, key, attributes = {}, options = {}) {
   // Asset not found
   const errorMsg =
     `Asset "${key}" not found in collection. ` +
-    'Available keys: ' +
+    "Available keys: " +
     Array.from(collection)
       .filter(item => item?.data?.key)
       .map(item => item.data.key)
-      .join(', ') || '(none)';
+      .join(", ") || "(none)";
 
   if (options.throwOnMissing) {
     throw new Error(errorMsg);
   }
   console.warn(`[assetLink Warning] ${errorMsg}`);
-  return '';
-}
+  return "";
+};
 
 export default assetLink;

@@ -13,19 +13,19 @@ const scriptLink = function(collection, key, options = {}) {
   // Validate collection parameter
   if (collection === undefined || collection === null) {
     const errorMsg =
-      'scriptLink requires a collection as the first parameter. ' +
+      "scriptLink requires a collection as the first parameter. " +
       'Usage: scriptLink(collections._scripts, "app.js"). ' +
-      'Make sure the collection is defined in your template.';
+      "Make sure the collection is defined in your template.";
 
     if (options.throwOnMissing) {
       throw new TypeError(errorMsg);
     }
     console.error(`[scriptLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Validate that collection is iterable
-  if (!Array.isArray(collection) && typeof collection[Symbol.iterator] !== 'function') {
+  if (!Array.isArray(collection) && typeof collection[Symbol.iterator] !== "function") {
     const errorMsg =
       `scriptLink collection must be an array or iterable, received ${typeof collection}. ` +
       'Pass a collection from Eleventy: scriptLink(collections._scripts, "app.js")';
@@ -34,11 +34,11 @@ const scriptLink = function(collection, key, options = {}) {
       throw new TypeError(errorMsg);
     }
     console.error(`[scriptLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Validate key parameter
-  if (typeof key !== 'string') {
+  if (typeof key !== "string") {
     const errorMsg =
       `scriptLink key must be a string, received ${typeof key}. ` +
       'Example: scriptLink(collections._scripts, "app.js")';
@@ -47,48 +47,48 @@ const scriptLink = function(collection, key, options = {}) {
       throw new TypeError(errorMsg);
     }
     console.error(`[scriptLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
-  if (key.trim() === '') {
+  if (key.trim() === "") {
     const errorMsg =
-      'scriptLink key cannot be empty. ' +
+      "scriptLink key cannot be empty. " +
       'Provide the filename of the script: scriptLink(collections._scripts, "app.js")';
 
     if (options.throwOnMissing) {
       throw new Error(errorMsg);
     }
     console.error(`[scriptLink Error] ${errorMsg}`);
-    return '';
+    return "";
   }
 
   // Search for the asset in the collection
   for (let item of collection) {
     // Validate item structure
-    if (!item || typeof item !== 'object') {
+    if (!item || typeof item !== "object") {
       continue;
     }
 
-    if (!item.data || typeof item.data !== 'object') {
+    if (!item.data || typeof item.data !== "object") {
       continue;
     }
 
     if (item.data.key === key) {
       // Validate that item has a URL
-      if (!item.url || typeof item.url !== 'string') {
+      if (!item.url || typeof item.url !== "string") {
         const errorMsg =
           `Asset "${key}" found but has no valid URL. ` +
-          'This may indicate a problem with asset processing.';
+          "This may indicate a problem with asset processing.";
 
         if (options.throwOnMissing) {
           throw new Error(errorMsg);
         }
         console.error(`[scriptLink Error] ${errorMsg}`);
-        return '';
+        return "";
       }
 
       // Build script tag with integrity if available
-      if ('integrity' in item.data && item.data.integrity != undefined) {
+      if ("integrity" in item.data && item.data.integrity != undefined) {
         return `<script src="${item.url}" integrity="${item.data.integrity}" crossorigin="anonymous" defer></script>`;
       }
       else {
@@ -100,17 +100,17 @@ const scriptLink = function(collection, key, options = {}) {
   // Asset not found
   const errorMsg =
     `Script asset "${key}" not found in collection. ` +
-    'Available keys: ' +
+    "Available keys: " +
     Array.from(collection)
       .filter(item => item?.data?.key)
       .map(item => item.data.key)
-      .join(', ') || '(none)';
+      .join(", ") || "(none)";
 
   if (options.throwOnMissing) {
     throw new Error(errorMsg);
   }
   console.warn(`[scriptLink Warning] ${errorMsg}`);
-  return '';
-}
+  return "";
+};
 
 export default scriptLink;

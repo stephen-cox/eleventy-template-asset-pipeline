@@ -3,6 +3,6 @@
  */
 
 module.exports = (async () => {
-  const { default: assetLink } = await import('./assetLink.js');
+  const { default: assetLink } = await import("./assetLink.js");
   return assetLink;
 })();
