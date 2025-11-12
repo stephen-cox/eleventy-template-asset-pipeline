@@ -3,6 +3,6 @@
  */
 
 module.exports = (async () => {
-  const { default: scriptLink } = await import("./scriptLink.js");
-  return scriptLink;
+	const { default: scriptLink } = await import("./scriptLink.js");
+	return scriptLink;
 })();

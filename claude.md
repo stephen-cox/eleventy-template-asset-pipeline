@@ -9,6 +9,7 @@ This file provides context for Claude (AI assistant) when working on this projec
 **Purpose:** Integrate asset pipelines (CSS, JS, etc.) into the Eleventy build process without requiring separate task runners like Gulp.
 
 **Key Features:**
+
 - Process assets during 11ty build
 - Production cache-busting with content hashes
 - Subresource Integrity (SRI) hash generation
@@ -112,12 +113,14 @@ eleventy-template-asset-pipeline/
 ### Cross-Platform Considerations
 
 **Path separators:**
+
 - Unix/Linux/macOS use `/`
 - Windows uses `\`
 - Always use `[\/\\]` in regex patterns for paths
 - Tests must pass on all platforms (Ubuntu, Windows, macOS)
 
 **Line endings:**
+
 - Unix: LF (`\n`)
 - Windows: CRLF (`\r\n`)
 - Not currently an issue but be aware
@@ -126,12 +129,12 @@ eleventy-template-asset-pipeline/
 
 ```javascript
 // ✅ Correct (ES modules)
-import crypto from 'crypto';
-import { glob } from 'glob';
+import crypto from "crypto";
+import { glob } from "glob";
 export default MyClass;
 
 // ❌ Wrong (CommonJS - don't use)
-const crypto = require('crypto');
+const crypto = require("crypto");
 module.exports = MyClass;
 ```
 
@@ -140,12 +143,14 @@ module.exports = MyClass;
 **Framework:** AVA (Eleventy's standard)
 
 **Test Organization:**
+
 - 41 total tests across 4 files
 - Each component has dedicated test file
 - Tests cover success cases, error cases, edge cases
 - Cross-platform path handling required
 
 **Running Tests:**
+
 ```bash
 npm test              # Run all tests once
 npm run test:watch    # Watch mode
@@ -153,6 +158,7 @@ npx ava test/ProcessAssets.test.js  # Specific file
 ```
 
 **Test Patterns:**
+
 ```javascript
 // Good: Cross-platform path regex
 t.regex(file.path, /test[\/\\]fixtures[\/\\]sample\.css$/);
@@ -164,6 +170,7 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 ### CI/CD Setup
 
 **GitHub Actions** (`.github/workflows/test.yml`):
+
 - Runs on push/PR to `main` or `develop`
 - Tests on Node.js 18.x, 20.x, 22.x
 - Tests on Ubuntu, Windows, macOS (9 combinations)
@@ -171,6 +178,7 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 - Status badge in README
 
 **Requirements:**
+
 - `package-lock.json` MUST be committed
 - Tests MUST pass on all platforms
 - `fail-fast: false` to catch platform-specific issues
@@ -190,6 +198,7 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 ### Common Tasks
 
 #### Adding a New Feature
+
 1. Update relevant source file(s)
 2. Add tests in corresponding test file
 3. Update README.md with usage examples
@@ -197,6 +206,7 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 5. Consider cross-platform implications
 
 #### Fixing a Bug
+
 1. Write a failing test that reproduces the bug
 2. Fix the bug in source
 3. Verify test now passes
@@ -204,10 +214,12 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 5. Add regression test to prevent recurrence
 
 #### Adding New Dependencies
+
 ```bash
 npm install --save package-name        # Runtime dependency
 npm install --save-dev package-name    # Dev dependency
 ```
+
 - Always commit updated `package-lock.json`
 - Justify new dependencies (minimize bloat)
 - Check license compatibility (MIT preferred)
@@ -224,6 +236,7 @@ npm install --save-dev package-name    # Dev dependency
 ### Git Conventions
 
 **Commit Messages:**
+
 - Use descriptive multi-line messages
 - First line: Brief summary (50 chars)
 - Blank line
@@ -231,6 +244,7 @@ npm install --save-dev package-name    # Dev dependency
 - Use bullet points for lists
 
 **Example:**
+
 ```
 Add TypeScript definitions for better DX
 
@@ -246,16 +260,19 @@ autocomplete and type checking.
 ## Known Issues & Limitations
 
 ### High Priority (Should Fix Soon)
+
 1. **No error handling** - No try-catch blocks, fails silently
 2. **No input validation** - Missing required param checks
 3. **Inconsistent logging** - Mix of console.error and console.log
 
 ### Medium Priority
+
 4. **No TypeScript definitions** - Would improve DX
 5. **scriptLink inflexible** - No custom attributes like assetLink
 6. **Duplicated code** - Collection filter logic repeated
 
 ### Low Priority (Nice to Have)
+
 7. **No source map support** - Would help debugging
 8. **Hardcoded SHA-512** - Could be configurable
 9. **Limited documentation** - Missing CHANGELOG, CONTRIBUTING, examples
@@ -267,6 +284,7 @@ autocomplete and type checking.
 ### When Adding Features
 
 **Consider:**
+
 - Is this a breaking change? (Avoid if possible)
 - Does it work on all platforms? (Windows path issues are common)
 - Are there tests for success AND failure cases?
@@ -274,6 +292,7 @@ autocomplete and type checking.
 - Does it fit the plugin's scope?
 
 **Don't:**
+
 - Add dependencies without strong justification
 - Use platform-specific code without cross-platform fallbacks
 - Use `eval()`, `Function()`, or other code execution mechanisms
@@ -283,6 +302,7 @@ autocomplete and type checking.
 ### When Reviewing Code
 
 **Check for:**
+
 - ✅ All tests pass on all platforms
 - ✅ New features have tests
 - ✅ No security vulnerabilities introduced
@@ -302,13 +322,15 @@ autocomplete and type checking.
 ### Test Failures
 
 **Path issues:**
+
 ```javascript
 // Check what path is actually being generated
-console.log('Path:', files[0].source);
+console.log("Path:", files[0].source);
 // Then update regex to match both / and \
 ```
 
 **Async issues:**
+
 ```javascript
 // Ensure all async functions use await
 await processor.processDirectory();
@@ -316,6 +338,7 @@ await processor.processDirectory();
 ```
 
 **Platform-specific failures:**
+
 - Check GitHub Actions logs for specific platform
 - Look for path separator issues
 - Check for case-sensitivity issues (Windows is case-insensitive)
@@ -323,20 +346,23 @@ await processor.processDirectory();
 ### Local Development
 
 **Test on Windows (if on Unix):**
+
 - Use WSL (Windows Subsystem for Linux) for testing
 - Or use GitHub Actions as smoke test
 
 **Debug glob patterns:**
+
 ```javascript
-import { glob } from 'glob';
-const files = await glob('test/fixtures/*.css');
-console.log('Found files:', files);
+import { glob } from "glob";
+const files = await glob("test/fixtures/*.css");
+console.log("Found files:", files);
 ```
 
 **Debug hash generation:**
+
 ```javascript
-const hash = crypto.createHash('sha512').update(content).digest().toString('base64url');
-console.log('Hash:', hash.slice(0, 10));
+const hash = crypto.createHash("sha512").update(content).digest().toString("base64url");
+console.log("Hash:", hash.slice(0, 10));
 ```
 
 ## Context for Common Questions
@@ -344,6 +370,7 @@ console.log('Hash:', hash.slice(0, 10));
 ### "Why is package-lock.json committed?"
 
 For published npm packages, committing the lock file is best practice:
+
 - Ensures reproducible builds
 - Required for `npm ci` in CI/CD
 - Prevents surprise dependency updates
@@ -375,6 +402,7 @@ Users may be on any of these versions.
 ### "Why test on multiple OS?"
 
 Path handling differs significantly:
+
 - Windows: `C:\Users\...`, backslashes
 - Unix: `/home/...`, forward slashes
 - macOS: Similar to Unix but occasional edge cases
@@ -382,18 +410,21 @@ Path handling differs significantly:
 ## Quick Reference
 
 ### Run Tests
+
 ```bash
 npm test                    # All tests once
 npm run test:watch          # Watch mode
 ```
 
 ### Install Dependencies
+
 ```bash
 npm install                 # Install all deps
 npm ci                      # Clean install from lock file
 ```
 
 ### Verify Changes
+
 ```bash
 npm test                    # Must pass
 git status                  # Check what changed
@@ -401,6 +432,7 @@ git diff                    # Review changes
 ```
 
 ### Common Git Commands
+
 ```bash
 git add -A                  # Stage all changes
 git status                  # Check status
@@ -442,6 +474,7 @@ git push origin branch      # Push to remote
 ## For Future Claude Sessions
 
 When working on this project:
+
 1. Always check this file first for context
 2. Run `npm test` before committing
 3. Consider cross-platform implications
@@ -451,6 +484,7 @@ When working on this project:
 7. Update this file if architecture changes significantly
 
 **Recent Major Changes:**
+
 - 2025-11-06: Added comprehensive test suite (41 tests)
 - 2025-11-06: Fixed critical eval() security vulnerability
 - 2025-11-06: Fixed inDirectory array bug
