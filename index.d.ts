@@ -3,10 +3,7 @@
  * An Eleventy plugin to provide asset pipelines as part of the 11ty build process.
  */
 
-import ProcessAssets, {
-	ProcessAssetsConfig,
-	ProcessedAsset,
-} from "./src/ProcessAssets.js";
+import ProcessAssets, { ProcessAssetsConfig, ProcessedAsset } from "./src/ProcessAssets.js";
 import assetLink, {
 	LinkAttributes,
 	AssetLinkOptions,
