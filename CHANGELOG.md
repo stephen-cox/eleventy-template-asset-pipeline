@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.2] - 2025-11-12
 
 ### Added
+
 - Automated NPM publishing workflow for streamlined releases
 - TypeScript type definitions for enhanced IDE support and type safety
 - ESLint for JavaScript linting with Eleventy core style configuration
@@ -15,25 +16,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive linting and formatting checks in CI pipeline
 
 ### Changed
+
 - Updated development documentation with mandatory linting and formatting requirements
 - Refactored collection filter logic to reduce code duplication (Issue #3)
 
 ### Fixed
+
 - Prettier formatting issues across the codebase
 - Updated package-lock.json to reflect new development dependencies
 
 ## [0.2.1] - 2025-11-11
 
 ### Added
+
 - Comprehensive error handling and input validation (Issue #2)
 
 ### Fixed
+
 - Fixed sanitizePath to preserve path format for glob compatibility
 - Fixed ProcessAssets to properly iterate over inDirectory array
 
 ## [0.2.0] - 2025-11-06
 
 ### Fixed
+
 - Fixed error in cleaning up hash for cache busting
 
 ## Earlier Versions
