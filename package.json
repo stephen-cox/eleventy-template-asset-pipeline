@@ -5,20 +5,25 @@
 	"type": "module",
 	"main": "index.cjs",
 	"module": "index.js",
+	"types": "index.d.ts",
 	"exports": {
 		".": {
+			"types": "./index.d.ts",
 			"import": "./index.js",
 			"require": "./index.cjs"
 		},
 		"./src/ProcessAssets": {
+			"types": "./src/ProcessAssets.d.ts",
 			"import": "./src/ProcessAssets.js",
 			"require": "./src/ProcessAssets.cjs"
 		},
 		"./src/shortcodes/assetLink": {
+			"types": "./src/shortcodes/assetLink.d.ts",
 			"import": "./src/shortcodes/assetLink.js",
 			"require": "./src/shortcodes/assetLink.cjs"
 		},
 		"./src/shortcodes/scriptLink": {
+			"types": "./src/shortcodes/scriptLink.d.ts",
 			"import": "./src/shortcodes/scriptLink.js",
 			"require": "./src/shortcodes/scriptLink.cjs"
 		}

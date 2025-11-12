@@ -56,18 +56,25 @@ This file provides context for Claude (AI assistant) when working on this projec
 ```
 eleventy-template-asset-pipeline/
 ├── index.js                      # Plugin entry point
+├── index.d.ts                    # TypeScript definitions (main)
 ├── package.json                  # Package config (ES modules)
 ├── package-lock.json             # Lock file (committed)
 ├── ava.config.js                 # AVA test configuration
+├── eslint.config.js              # ESLint configuration
+├── .prettierrc.json              # Prettier configuration
 ├── README.md                     # User documentation
 ├── LICENSE                       # MIT License
 ├── .gitignore                    # Git ignore (node_modules only)
+├── claude.md                     # This file - context for Claude
 │
 ├── src/
 │   ├── ProcessAssets.js          # Core processing class
+│   ├── ProcessAssets.d.ts        # TypeScript definitions
 │   └── shortcodes/
 │       ├── assetLink.js          # <link> tag generator
-│       └── scriptLink.js         # <script> tag generator
+│       ├── assetLink.d.ts        # TypeScript definitions
+│       ├── scriptLink.js         # <script> tag generator
+│       └── scriptLink.d.ts       # TypeScript definitions
 │
 ├── test/
 │   ├── ProcessAssets.test.js     # ProcessAssets tests (19 tests)
@@ -191,9 +198,14 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 2. **Make changes** to source files
 3. **Add/update tests** for changes
 4. **Run tests locally:** `npm test`
-5. **Commit with descriptive message**
-6. **Push and create PR**
-7. **Verify CI passes** on all platforms
+5. **Run linter:** `npm run lint`
+6. **Format code:** `npm run format`
+7. **Verify formatting:** `npm run format:check`
+8. **Commit with descriptive message** (only after all checks pass)
+9. **Push and create PR**
+10. **Verify CI passes** on all platforms
+
+**IMPORTANT:** Always run linting and formatting before committing. This ensures code quality and consistency.
 
 ### Common Tasks
 
@@ -230,8 +242,16 @@ npm install --save-dev package-name    # Dev dependency
 2. **Async/Await:** Prefer over callbacks or raw promises
 3. **JSDoc:** Add for all exported functions
 4. **Comments:** Explain "why", not "what"
-5. **Error Handling:** Currently minimal (see issue #1)
+5. **Error Handling:** Validate inputs and provide clear error messages
 6. **Console Logging:** Be consistent (error vs log vs warn)
+7. **Linting:** Run `npm run lint` - Uses ESLint with Eleventy core style
+8. **Formatting:** Run `npm run format` - Uses Prettier for consistent code style
+
+**Code Quality Tools:**
+
+- **ESLint** (`eslint.config.js`) - Enforces code quality and style rules
+- **Prettier** (`.prettierrc.json`) - Ensures consistent formatting
+- **Always run both before committing** - This is non-negotiable
 
 ### Git Conventions
 
@@ -261,13 +281,13 @@ autocomplete and type checking.
 
 ### High Priority (Should Fix Soon)
 
-1. **No error handling** - No try-catch blocks, fails silently
-2. **No input validation** - Missing required param checks
-3. **Inconsistent logging** - Mix of console.error and console.log
+1. ~~**No error handling**~~ - FIXED: Comprehensive error handling added (issue #1)
+2. ~~**No input validation**~~ - FIXED: Input validation added (issue #1)
+3. ~~**Inconsistent logging**~~ - FIXED: Consistent error handling (issue #1)
 
 ### Medium Priority
 
-4. **No TypeScript definitions** - Would improve DX
+4. ~~**No TypeScript definitions**~~ - FIXED: Complete TypeScript support added (issue #4)
 5. **scriptLink inflexible** - No custom attributes like assetLink
 6. **Duplicated code** - Collection filter logic repeated
 
@@ -416,6 +436,24 @@ npm test                    # All tests once
 npm run test:watch          # Watch mode
 ```
 
+### Code Quality Checks (REQUIRED before committing)
+
+```bash
+npm run lint                # Check for linting errors
+npm run lint:fix            # Auto-fix linting errors
+npm run format              # Format code with Prettier
+npm run format:check        # Verify code is formatted
+```
+
+### Pre-Commit Checklist
+
+```bash
+npm test                    # ✅ All tests must pass
+npm run lint                # ✅ No linting errors
+npm run format              # ✅ Code must be formatted
+npm run format:check        # ✅ Verify formatting
+```
+
 ### Install Dependencies
 
 ```bash
@@ -427,6 +465,8 @@ npm ci                      # Clean install from lock file
 
 ```bash
 npm test                    # Must pass
+npm run lint                # Must pass
+npm run format:check        # Must pass
 git status                  # Check what changed
 git diff                    # Review changes
 ```
@@ -465,8 +505,8 @@ git push origin branch      # Push to remote
 
 ---
 
-**Last Updated:** 2025-11-06
-**Plugin Version:** 0.1.1
+**Last Updated:** 2025-11-12
+**Plugin Version:** 0.2.1
 **Maintained By:** Stephen Cox <web@stephencox.net>
 
 ---
@@ -476,15 +516,31 @@ git push origin branch      # Push to remote
 When working on this project:
 
 1. Always check this file first for context
-2. Run `npm test` before committing
+2. **ALWAYS run before committing (in this order):**
+   - `npm test` - All tests must pass
+   - `npm run lint` - No linting errors allowed
+   - `npm run format` - Format all code
+   - `npm run format:check` - Verify formatting is correct
 3. Consider cross-platform implications
 4. Maintain backward compatibility
 5. Follow ES module conventions
 6. Add tests for new features
 7. Update this file if architecture changes significantly
 
+**PRE-COMMIT REQUIREMENTS (CRITICAL):**
+
+```bash
+# Run this before EVERY commit:
+npm test && npm run lint && npm run format && npm run format:check
+```
+
+If any of these fail, DO NOT commit. Fix the issues first.
+
 **Recent Major Changes:**
 
+- 2025-11-12: Added TypeScript type definitions (issue #4)
+- 2025-11-12: Added ESLint and Prettier for code quality
+- 2025-11-12: Established mandatory pre-commit checks
 - 2025-11-06: Added comprehensive test suite (41 tests)
 - 2025-11-06: Fixed critical eval() security vulnerability
 - 2025-11-06: Fixed inDirectory array bug
