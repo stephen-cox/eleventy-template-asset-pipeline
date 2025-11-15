@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ title or "PostCSS Example" }}</title>
+	{% assetLink collections._styles, 'main.css' %}
+</head>
+<body>
+	<header class="header">
+		<div class="container">
+			<h1 class="header__title">Eleventy + PostCSS Example</h1>
+			<p class="header__subtitle">Asset Pipeline Plugin Demo</p>
+		</div>
+	</header>
+
+	<main class="container">
+		{{ content | safe }}
+	</main>
+
+	<footer class="container text-center mt-2">
+		<p>&copy; 2024 PostCSS Example</p>
+	</footer>
+</body>
+</html>

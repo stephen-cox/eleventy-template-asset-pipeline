@@ -357,6 +357,520 @@ module.exports = ProcessAssetsPromise.then(
 );
 ```
 
+## Troubleshooting
+
+### Cache-Busted Filename Mismatches
+
+**Issue**: The generated cache-busted filename doesn't match the expected file in your template.
+
+**Cause**: The plugin generates unique hashes based on file content, which change when the file changes.
+
+**Solution**:
+
+1. Use the `assetLink` or `scriptLink` shortcodes instead of hardcoding filenames
+2. Ensure your template is using the correct collection name
+3. Verify the asset key matches your source filename (without hash)
+
+```html
+<!-- ❌ Don't hardcode filenames -->
+<link href="/assets/css/main-ABC123.css" rel="stylesheet" />
+
+<!-- ✅ Use shortcodes instead -->
+{% assetLink collections._styles, 'main.css' %}
+```
+
+### Invalid processFile Configuration
+
+**Issue**: Error message "No processFile function configured" or processFile returns undefined.
+
+**Cause**: The processFile function is missing or not returning processed content.
+
+**Solution**:
+
+1. Ensure processFile is defined as an async function
+2. Make sure it returns the processed content as a string
+3. Check that the function is passed in the configuration
+
+```js
+// ✅ Correct processFile implementation
+async function processFile(file, production) {
+	const content = await fs.readFile(file, "utf-8");
+	// Process content here
+	return processedContent; // Must return a string
+}
+
+// Pass it to the configuration
+eleventyConfig.addPlugin(eleventyTemplateAssetPipeline, {
+	styles: {
+		enabled: true,
+		processFile: processFile, // Include this!
+		// ... other config
+	},
+});
+```
+
+### Permission Errors
+
+**Issue**: EACCES or EPERM errors when processing files.
+
+**Cause**: Insufficient permissions to read input files or write output files.
+
+**Solution**:
+
+1. Check file and directory permissions
+2. Ensure the output directory exists or can be created
+3. Verify you have write permissions in the output directory
+4. On Windows, check if files are locked by another process
+
+```bash
+# Check permissions (Unix/Linux/macOS)
+ls -la _assets/css
+
+# Create output directory if needed
+mkdir -p _site/_assets/css
+
+# Fix permissions (Unix/Linux/macOS)
+chmod -R 755 _assets
+```
+
+### Directory Not Found Errors
+
+**Issue**: Cannot find files in specified inDirectory.
+
+**Cause**: Path is incorrect or relative path is not resolved correctly.
+
+**Solution**:
+
+1. Use paths relative to your Eleventy project root
+2. Verify the directory exists
+3. Check for typos in the path
+4. Ensure you're not using `..` in paths (security restriction)
+
+```js
+// ✅ Correct - relative to project root
+inDirectory: "./_assets/css";
+
+// ❌ Incorrect - directory traversal not allowed
+inDirectory: "../../../css";
+```
+
+### Assets Not Appearing in Collections
+
+**Issue**: Collections are empty or missing expected assets.
+
+**Cause**: Collection name mismatch or files not being processed.
+
+**Solution**:
+
+1. Verify the collection name in your template matches the configuration
+2. Check that files exist in the inDirectory
+3. Ensure files have the correct extension (inExtension)
+4. Look for error messages in the build output
+
+```js
+// Configuration
+collection: "_styles"
+
+// Template - must match exactly
+{% assetLink collections._styles, 'main.css' %}
+```
+
+### PostCSS/Sass/Webpack Errors
+
+**Issue**: Build fails with CSS or JavaScript processing errors.
+
+**Cause**: Errors in your asset processing configuration or source files.
+
+**Solution**:
+
+1. Test your processFile function independently
+2. Check for syntax errors in your CSS/JS files
+3. Verify all required dependencies are installed
+4. Review your PostCSS/Webpack configuration
+5. Add try-catch blocks for better error messages
+
+```js
+async function processFile(file, production) {
+	try {
+		const css = await fs.readFile(file, "utf-8");
+		const result = await postcss(plugins).process(css, { from: file });
+		return result.css;
+	} catch (error) {
+		console.error(`Failed to process ${file}:`, error);
+		throw error; // Re-throw to see in Eleventy output
+	}
+}
+```
+
+## Performance
+
+### Development vs Production Mode
+
+The plugin optimizes differently for development and production environments:
+
+**Development Mode** (`production: false`):
+
+- No cache busting - files use original names
+- Faster builds - skips hash generation
+- No integrity hashes - reduces computation
+- Easier debugging - predictable filenames
+
+**Production Mode** (`production: true`):
+
+- Cache busting enabled - unique hashes in filenames
+- SRI hash generation - enhanced security
+- Optimized for deployment - long-term caching
+
+**Setting the Mode**:
+
+```js
+// Recommended: Use environment variable
+production: process.env.ELEVENTY_ENV === "production"
+
+// Build commands in package.json
+{
+	"scripts": {
+		"build": "ELEVENTY_ENV=production eleventy",
+		"dev": "eleventy --serve"
+	}
+}
+```
+
+### Optimization Techniques
+
+#### 1. Minimize processFile Overhead
+
+Keep your processFile function efficient:
+
+```js
+// ✅ Good - cache PostCSS plugins
+const postcssPlugins = [require("postcss-import"), require("autoprefixer")];
+
+async function processFile(file, production) {
+	const css = await fs.readFile(file, "utf-8");
+	return await postcss(postcssPlugins).process(css, { from: file });
+}
+
+// ❌ Bad - recreates plugins every time
+async function processFile(file, production) {
+	const css = await fs.readFile(file, "utf-8");
+	return await postcss([
+		require("postcss-import"), // Loaded on every file!
+		require("autoprefixer"),
+	]).process(css, { from: file });
+}
+```
+
+#### 2. Use Multiple Input Directories
+
+Process files from multiple sources efficiently:
+
+```js
+new ProcessAssets({
+	inDirectory: ["./_assets/css", "./node_modules/some-package/css"],
+	inExtension: "css",
+	// ... other config
+});
+```
+
+#### 3. Conditional Processing
+
+Apply different processing based on the environment:
+
+```js
+async function processFile(file, production) {
+	const css = await fs.readFile(file, "utf-8");
+
+	if (production) {
+		// Full optimization for production
+		return await postcss([require("postcss-import"), require("autoprefixer"), require("cssnano")])
+			.process(css, { from: file })
+			.then((r) => r.css);
+	} else {
+		// Minimal processing for development
+		return await postcss([require("postcss-import")])
+			.process(css, { from: file })
+			.then((r) => r.css);
+	}
+}
+```
+
+#### 4. Optimize Eleventy Build
+
+Combine with Eleventy's incremental builds:
+
+```bash
+# Development with watch mode
+eleventy --serve --incremental
+
+# Production build
+ELEVENTY_ENV=production eleventy
+```
+
+### Performance Tips
+
+1. **Limit File Processing**: Only process top-level files (the plugin already does this)
+2. **Use Import/Include**: Let your CSS/JS tools handle dependencies (e.g., `@import` in CSS)
+3. **Cache Dependencies**: Initialize tools outside processFile when possible
+4. **Async Operations**: Always use async/await for I/O operations
+5. **Monitor Build Times**: Use Eleventy's built-in performance diagnostics
+
+```bash
+# See detailed build performance
+DEBUG=Eleventy* eleventy
+```
+
+## Browser Compatibility
+
+### Subresource Integrity (SRI) Support
+
+The plugin generates SRI hashes in production mode for enhanced security.
+
+**Browser Support**:
+
+- Chrome/Edge: 45+
+- Firefox: 43+
+- Safari: 11.1+
+- Opera: 32+
+
+**Automatic SRI Implementation**:
+
+In production mode, the plugin automatically generates integrity hashes:
+
+```html
+<!-- Generated by assetLink -->
+<link
+	href="/assets/css/main-ABC123.css"
+	rel="stylesheet"
+	integrity="sha512-xyz..."
+	crossorigin="anonymous"
+/>
+
+<!-- Generated by scriptLink -->
+<script
+	src="/assets/js/app-DEF456.js"
+	integrity="sha512-abc..."
+	crossorigin="anonymous"
+	defer
+></script>
+```
+
+**Compatibility Considerations**:
+
+- SRI requires CORS configuration for cross-origin assets
+- The `crossorigin="anonymous"` attribute is automatically added
+- Older browsers ignore the integrity attribute (graceful degradation)
+
+### ES Module Support
+
+The plugin supports both ES modules and CommonJS:
+
+**ES Modules (Recommended)**:
+
+```js
+import eleventyTemplateAssetPipeline from "@src-dev/eleventy-template-asset-pipeline";
+```
+
+**Browser Support**:
+
+- Chrome: 61+
+- Edge: 16+
+- Firefox: 60+
+- Safari: 11+
+
+**Fallback Strategy**:
+
+For broader browser support, use module/nomodule pattern:
+
+```html
+<!-- Modern browsers load this -->
+<script type="module" src="/assets/js/app.modern.js"></script>
+
+<!-- Legacy browsers load this -->
+<script nomodule src="/assets/js/app.legacy.js"></script>
+```
+
+### Cache Busting Compatibility
+
+Cache busting works in all browsers:
+
+- Uses filename-based hashing (universal support)
+- No browser-specific features required
+- Compatible with all CDNs and hosting platforms
+- Works with service workers and offline caching
+
+### CSS Features
+
+When using PostCSS or other processors, consider:
+
+**Autoprefixer**: Automatically adds vendor prefixes
+
+```js
+const postcssPlugins = [
+	require("autoprefixer")({
+		browsers: ["last 2 versions", "> 1%"],
+	}),
+];
+```
+
+**Custom Properties**: Consider fallbacks for older browsers
+
+```css
+/* Good practice with fallbacks */
+.element {
+	background: #333; /* Fallback */
+	background: var(--bg-color, #333);
+}
+```
+
+## Comparison with Alternatives
+
+### vs. Gulp
+
+**Gulp**:
+
+- Separate build process
+- Requires gulpfile configuration
+- More complex setup
+- Runs independently of Eleventy
+
+**This Plugin**:
+
+- Integrated with Eleventy build
+- Configured in `.eleventy.js`
+- Simpler setup for Eleventy projects
+- Single build command
+- Native access to Eleventy collections
+
+**When to use Gulp**:
+
+- Complex multi-step build processes
+- Legacy projects already using Gulp
+- Need for advanced task orchestration
+
+**When to use this plugin**:
+
+- Eleventy-focused projects
+- Prefer integrated build process
+- Want simpler configuration
+- Need tight Eleventy integration
+
+### vs. Grunt
+
+**Grunt**:
+
+- Task-based automation
+- Gruntfile configuration
+- Older, less actively maintained
+- Configuration over code
+
+**This Plugin**:
+
+- Code over configuration
+- Modern JavaScript/async-await
+- Actively maintained
+- Purpose-built for Eleventy
+
+**When to use Grunt**:
+
+- Existing Grunt infrastructure
+- Preference for configuration-based approach
+
+**When to use this plugin**:
+
+- Modern JavaScript projects
+- Eleventy-specific workflows
+- Active development and support
+
+### vs. Eleventy Assets Plugin
+
+**Eleventy Assets Plugin**:
+
+- Different approach to asset handling
+- May have different features
+
+**This Plugin**:
+
+- JavaScript template-based approach
+- Virtual template support
+- Built-in cache busting
+- SRI hash generation
+- Flexible processFile function
+- Dual module system support
+
+**Advantages of this plugin**:
+
+1. **Flexibility**: Use any asset processor (PostCSS, Sass, Webpack, esbuild)
+2. **Security**: Automatic SRI hash generation
+3. **Performance**: Built-in cache busting
+4. **Integration**: Native Eleventy collections
+5. **Modern**: ES modules and CommonJS support
+
+### vs. Manual Asset Pipeline
+
+**Manual Approach**:
+
+- Separate npm scripts for CSS/JS
+- Manual cache busting
+- Custom shortcode creation
+- Multiple build steps
+
+**This Plugin**:
+
+- Single integrated build
+- Automatic cache busting
+- Built-in shortcodes
+- Unified configuration
+
+**Manual Build Example**:
+
+```json
+{
+	"scripts": {
+		"build:css": "postcss src/css -d dist/css",
+		"build:js": "webpack",
+		"build:eleventy": "eleventy",
+		"build": "npm run build:css && npm run build:js && npm run build:eleventy"
+	}
+}
+```
+
+**With This Plugin**:
+
+```json
+{
+	"scripts": {
+		"build": "eleventy"
+	}
+}
+```
+
+**Advantages of this plugin**:
+
+1. **Simplicity**: Single build command
+2. **Consistency**: Everything in `.eleventy.js`
+3. **Reliability**: No manual coordination needed
+4. **Features**: Cache busting and SRI included
+5. **Maintenance**: Less configuration to manage
+
+### Migration Guide
+
+#### From Gulp/Grunt
+
+1. Identify your asset processing tasks
+2. Convert task functions to processFile functions
+3. Move configuration to `.eleventy.js`
+4. Remove gulp/grunt dependencies
+5. Update build scripts
+
+#### From Manual Pipeline
+
+1. Install this plugin
+2. Create processFile function from your existing scripts
+3. Configure plugin in `.eleventy.js`
+4. Replace custom shortcodes with built-in ones
+5. Simplify package.json scripts
+
 ## Contributing and Releases
 
 ### Development

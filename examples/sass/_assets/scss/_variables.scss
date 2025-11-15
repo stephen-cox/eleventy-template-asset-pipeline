@@ -1,0 +1,44 @@
+/**
+ * Variables - Define all colors, spacing, and other constants
+ */
+
+/* Colors */
+$color-primary: #3b82f6;
+$color-secondary: #8b5cf6;
+$color-text: #1f2937;
+$color-text-light: #6b7280;
+$color-background: #ffffff;
+$color-border: #e5e7eb;
+
+/* Spacing */
+$spacing-unit: 1rem;
+$spacing-small: $spacing-unit * 0.5;
+$spacing-large: $spacing-unit * 2;
+
+/* Typography */
+$font-family:
+	-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-base: 1rem;
+$font-size-large: 1.25rem;
+$font-size-small: 0.875rem;
+
+/* Border radius */
+$border-radius-small: 0.25rem;
+$border-radius-medium: 0.5rem;
+$border-radius-large: 1rem;
+
+/* Shadows */
+$shadow-small: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+$shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+/* Transitions */
+$transition-fast: 0.15s;
+$transition-base: 0.2s;
+$transition-slow: 0.3s;
+
+/* Breakpoints */
+$breakpoint-small: 640px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1024px;
+$breakpoint-xlarge: 1280px;

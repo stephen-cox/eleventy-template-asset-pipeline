@@ -7,6 +7,10 @@ export const GLOB_TESTS = ["**/test/**/*.js", "**/test/**/*.cjs", "**/*.spec.js"
 
 export default [
 	{
+		name: "eleventy-template-asset-pipeline/ignores-build",
+		ignores: ["examples/*/_site/**", "examples/*/node_modules/**"],
+	},
+	{
 		name: "eleventy-template-asset-pipeline/setup/js",
 		...pluginJs.configs.recommended,
 	},
@@ -25,7 +29,14 @@ export default [
 		rules: {
 			"no-async-promise-executor": "warn",
 			"no-prototype-builtins": "warn",
-			"no-unused-vars": "warn",
+			"no-unused-vars": [
+				"warn",
+				{
+					argsIgnorePattern: "^_",
+					varsIgnorePattern: "^_",
+					caughtErrorsIgnorePattern: "^_",
+				},
+			],
 			"@stylistic/js/space-unary-ops": "error",
 		},
 	},
@@ -44,6 +55,15 @@ export default [
 		files: GLOB_TESTS,
 		rules: {
 			"no-unused-vars": "off",
+		},
+	},
+	{
+		name: "eleventy-template-asset-pipeline/examples-browser",
+		files: ["examples/**/*.js"],
+		languageOptions: {
+			globals: {
+				...globals.browser,
+			},
 		},
 	},
 	{

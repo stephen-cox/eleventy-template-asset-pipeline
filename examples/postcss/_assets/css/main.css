@@ -1,0 +1,51 @@
+/**
+ * Main CSS file - imports all other styles
+ * This is the only file processed by the plugin (top-level)
+ */
+
+@import "_base.css";
+@import "_components.css";
+
+/* Custom media queries */
+@custom-media --small-viewport (max-width: 640px);
+@custom-media --medium-viewport (min-width: 641px) and (max-width: 1024px);
+@custom-media --large-viewport (min-width: 1025px);
+
+/* Main layout */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1rem;
+}
+
+@media (--small-viewport) {
+	.container {
+		padding: 0.5rem;
+	}
+}
+
+@media (--large-viewport) {
+	.container {
+		padding: 2rem;
+	}
+}
+
+/* Grid layout */
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 1rem;
+}
+
+/* Utility classes */
+.text-center {
+	text-align: center;
+}
+
+.mt-1 {
+	margin-top: 1rem;
+}
+
+.mt-2 {
+	margin-top: 2rem;
+}

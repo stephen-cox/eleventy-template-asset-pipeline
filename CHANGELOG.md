@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Comprehensive documentation improvements
+- Examples directory with working configurations for PostCSS, Webpack, Sass, and esbuild
+- API Reference documentation
+- Troubleshooting section in README
+- Performance optimization guidelines
+- Browser compatibility information
+- Comparison with alternative solutions
+
 ## [0.2.2] - 2025-11-12
 
 ### Added
@@ -45,3 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Earlier Versions
 
 For earlier version history, please see the [commit history](https://github.com/stephen-cox/eleventy-template-asset-pipeline/commits/main).
+
+[Unreleased]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/stephen-cox/eleventy-template-asset-pipeline/releases/tag/v0.2.0

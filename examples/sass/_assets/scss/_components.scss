@@ -1,0 +1,117 @@
+/**
+ * Components - Reusable component styles
+ */
+
+@use "variables" as vars;
+@use "mixins";
+
+/* Button component */
+.btn {
+	display: inline-block;
+	padding: vars.$spacing-small vars.$spacing-unit;
+	background-color: vars.$color-primary;
+	color: white;
+	border: none;
+	border-radius: vars.$border-radius-small;
+	cursor: pointer;
+	font-size: vars.$font-size-base;
+	transition: background-color vars.$transition-base;
+
+	&:hover {
+		background-color: darken(vars.$color-primary, 10%);
+		text-decoration: none;
+	}
+
+	&--secondary {
+		background-color: vars.$color-secondary;
+
+		&:hover {
+			background-color: darken(vars.$color-secondary, 10%);
+		}
+	}
+
+	&--outline {
+		background-color: transparent;
+		border: 2px solid vars.$color-primary;
+		color: vars.$color-primary;
+
+		&:hover {
+			background-color: vars.$color-primary;
+			color: white;
+		}
+	}
+}
+
+/* Card component */
+.card {
+	background: white;
+	border: 1px solid vars.$color-border;
+	border-radius: vars.$border-radius-medium;
+	padding: vars.$spacing-large;
+	@include mixins.card-elevation(1);
+	@include mixins.hover-lift;
+
+	&__title {
+		font-size: vars.$font-size-large;
+		margin-bottom: vars.$spacing-small;
+		color: vars.$color-text;
+	}
+
+	&__content {
+		color: vars.$color-text-light;
+		line-height: 1.6;
+	}
+
+	&--featured {
+		border-color: vars.$color-primary;
+		@include mixins.card-elevation(2);
+	}
+}
+
+/* Badge component */
+.badge {
+	display: inline-block;
+	padding: 0.25rem 0.5rem;
+	background-color: vars.$color-primary;
+	color: white;
+	border-radius: vars.$border-radius-small;
+	font-size: vars.$font-size-small;
+	font-weight: 600;
+
+	&--success {
+		background-color: #10b981;
+	}
+
+	&--warning {
+		background-color: #f59e0b;
+	}
+
+	&--danger {
+		background-color: #ef4444;
+	}
+}
+
+/* Alert component */
+.alert {
+	padding: vars.$spacing-unit;
+	border-radius: vars.$border-radius-small;
+	margin-bottom: vars.$spacing-unit;
+
+	&--info {
+		background-color: #dbeafe;
+		color: #1e40af;
+		border-left: 4px solid vars.$color-primary;
+	}
+
+	&--success {
+		background-color: #d1fae5;
+		color: #065f46;
+		border-left: 4px solid #10b981;
+	}
+
+	&--warning {
+		background-color: #fef3c7;
+		color: #92400e;
+		border-left: 4px solid #f59e0b;
+	}
+}

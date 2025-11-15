@@ -1,0 +1,119 @@
+/**
+ * Main SCSS file - imports all other styles
+ * Uses modern @use instead of @import
+ */
+
+@use "variables" as vars;
+@use "mixins";
+@use "components";
+
+/* Base styles */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: vars.$font-family;
+	color: vars.$color-text;
+	background-color: vars.$color-background;
+	line-height: 1.6;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-bottom: vars.$spacing-unit * 0.5;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+h1 {
+	font-size: 2.5rem;
+}
+
+h2 {
+	font-size: 2rem;
+}
+
+h3 {
+	font-size: 1.5rem;
+}
+
+p {
+	margin-bottom: vars.$spacing-unit;
+}
+
+a {
+	color: vars.$color-primary;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+/* Layout */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: vars.$spacing-unit;
+
+	@media (max-width: 640px) {
+		padding: vars.$spacing-unit * 0.5;
+	}
+
+	@media (min-width: 1025px) {
+		padding: vars.$spacing-unit * 2;
+	}
+}
+
+/* Grid */
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: vars.$spacing-unit;
+}
+
+/* Utility classes */
+.text-center {
+	text-align: center;
+}
+
+.mt-1 {
+	margin-top: vars.$spacing-unit;
+}
+
+.mt-2 {
+	margin-top: vars.$spacing-unit * 2;
+}
+
+/* Header */
+.header {
+	@include mixins.gradient-background(vars.$color-primary, vars.$color-secondary);
+	color: white;
+	padding: vars.$spacing-unit * 2 0;
+	margin-bottom: vars.$spacing-unit * 2;
+
+	&__title {
+		margin: 0;
+		font-size: 2rem;
+	}
+
+	&__subtitle {
+		margin: 0.5rem 0 0 0;
+		opacity: 0.9;
+	}
+}
+
+/* Footer */
+footer {
+	margin-top: vars.$spacing-unit * 2;
+	padding: vars.$spacing-unit;
+	color: vars.$color-text-light;
+}
