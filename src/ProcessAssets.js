@@ -263,8 +263,8 @@ class ProcessAssets {
 							try {
 								// Add hash of the content to destination file name for cache busting.
 								const sha512 = crypto.createHash("sha512");
-								const hash = sha512.update(content).digest().toString("base64");
-								const destination = `${basename}-${hash.replace(/\//g, "").replace(/\+/g, "").slice(0, 10).toUpperCase()}.${this.outExtension}`;
+								const hash = sha512.update(content).digest().toString("base64url");
+								const destination = `${basename}-${hash.slice(0, 10).toUpperCase()}.${this.outExtension}`;
 
 								files.push({
 									index: filename,
