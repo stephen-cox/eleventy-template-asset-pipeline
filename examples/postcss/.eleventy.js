@@ -1,5 +1,9 @@
 import fs from "fs/promises";
 import postcss from "postcss";
+import postcssImport from "postcss-import";
+import autoprefixer from "autoprefixer";
+import postcssCustomMedia from "postcss-custom-media";
+import cssnano from "cssnano";
 import eleventyTemplateAssetPipeline from "@src-dev/eleventy-template-asset-pipeline";
 
 /**
@@ -15,10 +19,10 @@ async function processFile(file, production) {
 	if (production) {
 		// Production build: full optimization
 		return await postcss([
-			require("postcss-import"),
-			require("autoprefixer"),
-			require("postcss-custom-media"),
-			require("cssnano")({
+			postcssImport,
+			autoprefixer,
+			postcssCustomMedia,
+			cssnano({
 				preset: "default",
 			}),
 		])
@@ -26,7 +30,7 @@ async function processFile(file, production) {
 			.then((result) => result.css);
 	} else {
 		// Development build: minimal processing for faster builds
-		return await postcss([require("postcss-import"), require("autoprefixer")])
+		return await postcss([postcssImport, autoprefixer])
 			.process(css, { from: file })
 			.then((result) => result.css);
 	}

@@ -902,7 +902,6 @@ This package uses automated NPM publishing via GitHub Actions. To publish a new 
    ```
 
 3. **Create a GitHub Release**:
-
    - Go to the [Releases page](https://github.com/stephen-cox/eleventy-template-asset-pipeline/releases)
    - Click "Draft a new release"
    - Create a new tag matching the version in `package.json` (e.g., `0.2.2`)

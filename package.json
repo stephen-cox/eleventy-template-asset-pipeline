@@ -48,6 +48,7 @@
 	"scripts": {
 		"test": "ava",
 		"test:watch": "ava --watch",
+		"test:examples": "node examples/test-all.js",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",

@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "eleventy --serve",
 		"build": "ELEVENTY_ENV=production eleventy",
-		"clean": "rm -rf _site"
+		"clean": "rm -rf _site",
+		"test": "node test.js"
 	},
 	"dependencies": {
 		"@src-dev/eleventy-template-asset-pipeline": "^0.2.1",
