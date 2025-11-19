@@ -17,6 +17,7 @@ If no argument is provided or the argument is invalid, ask the user which type o
 ### 1. Verify Clean Working Directory
 
 First, check that the working directory is clean (no uncommitted changes):
+
 ```bash
 git status
 ```
@@ -26,6 +27,7 @@ If there are uncommitted changes, stop and ask the user to commit or stash them 
 ### 2. Run Tests
 
 Run the test suite and ensure all tests pass:
+
 ```bash
 npm test
 ```
@@ -35,6 +37,7 @@ If any tests fail, stop and report the failures. Do not proceed until all tests 
 ### 3. Run Linting
 
 Run the linter and ensure there are no errors:
+
 ```bash
 npm run lint
 ```
@@ -44,6 +47,7 @@ If linting fails, stop and report the errors. Do not proceed until linting passe
 ### 4. Bump Version
 
 Run npm version with the specified bump type (patch/minor/major):
+
 ```bash
 npm version [VERSION_TYPE] --no-git-tag-version
 ```
@@ -57,12 +61,15 @@ Update the CHANGELOG.md file:
 1. Read the current CHANGELOG.md
 2. Find the `[Unreleased]` section
 3. Replace `## [Unreleased]` with:
+
    ```
    ## [Unreleased]
 
    ## [NEW_VERSION] - YYYY-MM-DD
    ```
+
    Where NEW_VERSION is the version from step 4 and YYYY-MM-DD is today's date
+
 4. Update the version comparison links at the bottom:
    - Update the `[Unreleased]` link to compare from the new version to HEAD
    - Add a new link for the new version comparing it to the previous version
@@ -72,6 +79,7 @@ Update the CHANGELOG.md file:
 ### 6. Commit Changes
 
 Create a commit with the version bump and changelog update:
+
 ```bash
 git add package.json package-lock.json CHANGELOG.md
 git commit -m "Release [NEW_VERSION]"
@@ -80,6 +88,7 @@ git commit -m "Release [NEW_VERSION]"
 ### 7. Push and Create PR
 
 Push the changes to the remote branch and create a pull request:
+
 ```bash
 git push -u origin [CURRENT_BRANCH]
 gh pr create --title "Release [NEW_VERSION]" --body "Prepare release [NEW_VERSION]
@@ -101,6 +110,7 @@ After merging, the GitHub Actions workflow will automatically publish to NPM."
 ### 8. Summary
 
 Provide a summary of what was done:
+
 - New version number
 - Link to the PR
 - Reminder that the package will be automatically published to NPM after the PR is merged
@@ -108,6 +118,7 @@ Provide a summary of what was done:
 ## Error Handling
 
 If any step fails:
+
 1. Report the specific error to the user
 2. Do not proceed to subsequent steps
 3. Provide guidance on how to fix the issue
