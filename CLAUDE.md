@@ -55,53 +55,71 @@ This file provides context for Claude (AI assistant) when working on this projec
 
 ```
 eleventy-template-asset-pipeline/
-├── index.js                      # Plugin entry point
+├── index.js                      # Plugin entry point (ESM)
+├── index.cjs                     # CommonJS wrapper
 ├── index.d.ts                    # TypeScript definitions (main)
-├── package.json                  # Package config (ES modules)
+├── package.json                  # Package config (ES modules, dual exports)
 ├── package-lock.json             # Lock file (committed)
 ├── ava.config.js                 # AVA test configuration
 ├── eslint.config.js              # ESLint configuration
 ├── .prettierrc.json              # Prettier configuration
+├── .prettierignore               # Prettier ignore
+├── .npmignore                    # Files excluded from the published package
 ├── README.md                     # User documentation
+├── API.md                        # API reference
+├── CHANGELOG.md                  # Keep a Changelog format
+├── CONTRIBUTING.md               # Contributor guide
+├── CLAUDE.md                     # This file - context for Claude
 ├── LICENSE                       # MIT License
 ├── .gitignore                    # Git ignore (node_modules only)
-├── claude.md                     # This file - context for Claude
 │
 ├── src/
 │   ├── ProcessAssets.js          # Core processing class
+│   ├── ProcessAssets.cjs         # CommonJS wrapper
 │   ├── ProcessAssets.d.ts        # TypeScript definitions
 │   └── shortcodes/
 │       ├── assetLink.js          # <link> tag generator
+│       ├── assetLink.cjs         # CommonJS wrapper
 │       ├── assetLink.d.ts        # TypeScript definitions
 │       ├── scriptLink.js         # <script> tag generator
+│       ├── scriptLink.cjs        # CommonJS wrapper
 │       └── scriptLink.d.ts       # TypeScript definitions
 │
-├── test/
-│   ├── ProcessAssets.test.js     # ProcessAssets tests (19 tests)
-│   ├── plugin.test.js            # Plugin config tests (10 tests)
+├── test/                         # 123 tests across 9 files
+│   ├── ProcessAssets.test.js         # ProcessAssets (14 tests)
+│   ├── error-handling.test.js        # ProcessAssets errors (23 tests)
+│   ├── plugin.test.js                # Plugin config (10 tests)
+│   ├── plugin-error-handling.test.js # Plugin errors (11 tests)
+│   ├── interop.test.js               # ESM/CJS interop (9 tests)
+│   ├── cjs-template-pattern.test.js  # CJS template usage (2 tests)
+│   ├── commonjs-usage.cjs            # CJS fixture for interop tests
+│   ├── example-template.11ty.cjs     # CJS template fixture
 │   ├── shortcodes/
-│   │   ├── assetLink.test.js     # assetLink tests (10 tests)
-│   │   └── scriptLink.test.js    # scriptLink tests (10 tests)
+│   │   ├── assetLink.test.js         # assetLink (10 tests)
+│   │   ├── scriptLink.test.js        # scriptLink (9 tests)
+│   │   └── error-handling.test.js    # Shortcode errors (35 tests)
 │   └── fixtures/
-│       ├── sample.css             # Test CSS file
-│       ├── sample.js              # Test JS file
+│       ├── sample.css                # Test CSS file
+│       ├── sample.js                 # Test JS file
 │       └── nested/
-│           └── nested.css         # For testing that nested files are ignored
+│           └── nested.css            # For testing that nested files are ignored
 │
-├── .github/
-│   ├── workflows/
-│   │   ├── test.yml              # GitHub Actions CI
-│   │   └── README.md             # Workflow documentation
-│   └── issues/                   # (if created)
+├── examples/                     # Working example projects (npm run test:examples)
+│   ├── postcss/                  # PostCSS pipeline
+│   ├── sass/                     # Sass pipeline
+│   ├── webpack/                  # Webpack pipeline
+│   ├── esbuild/                  # esbuild pipeline
+│   └── test-all.js               # Builds every example and checks output
 │
-└── .github-issues/                # Issue templates
-    ├── README.md
-    ├── 01-error-handling-validation.md
-    ├── 02-code-quality-improvements.md
-    ├── 03-typescript-support.md
-    ├── 04-enhanced-shortcode-flexibility.md
-    ├── 05-documentation-improvements.md
-    └── 06-additional-features.md
+├── .claude/
+│   └── commands/
+│       └── release.md            # /release - version bump, changelog, PR
+│
+└── .github/
+    └── workflows/
+        ├── test.yml              # GitHub Actions CI (test matrix)
+        ├── publish.yml           # NPM publish on merge to main
+        └── README.md             # Workflow documentation
 ```
 
 ## Important Technical Details
@@ -116,6 +134,21 @@ eleventy-template-asset-pipeline/
 2. **FIXED:** inDirectory array bug in ProcessAssets.js
    - Lines 40-45 wrapped in array, then line 46 overwrote it
    - Line 46 has been removed
+
+### Hash Encodings (two, deliberately different)
+
+Production builds hash the processed content once and encode that digest twice:
+
+- **Cache-busting filename** - `base64url`, truncated to 10 characters and
+  uppercased. Standard base64 can contain `/` and `+`, which are not safe in a
+  URL path segment.
+- **`integrity` attribute** - standard `base64`. The Subresource Integrity
+  grammar admits only standard base64, and browsers _silently ignore_ metadata
+  they cannot parse, so a base64url digest means no verification at all rather
+  than a failed check.
+
+Never collapse these back into one value (see issue #25, fixed in 1.1.0). Tests
+in `test/ProcessAssets.test.js` pin both encodings.
 
 ### Cross-Platform Considerations
 
@@ -151,8 +184,9 @@ module.exports = MyClass;
 
 **Test Organization:**
 
-- 41 total tests across 4 files
-- Each component has dedicated test file
+- 123 total tests across 9 files
+- Each component has dedicated test file, with error handling split out
+- ESM/CJS interop has its own tests plus `.cjs` fixtures
 - Tests cover success cases, error cases, edge cases
 - Cross-platform path handling required
 
@@ -162,6 +196,7 @@ module.exports = MyClass;
 npm test              # Run all tests once
 npm run test:watch    # Watch mode
 npx ava test/ProcessAssets.test.js  # Specific file
+npm run test:examples # Build every example project and check its output
 ```
 
 **Test Patterns:**
@@ -183,6 +218,13 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 - Tests on Ubuntu, Windows, macOS (9 combinations)
 - Uses `npm ci` (requires package-lock.json)
 - Status badge in README
+
+**Publishing** (`.github/workflows/publish.yml`):
+
+- Publishes to NPM when a release commit lands on `main`
+- Prepare releases with the `/release` command (`.claude/commands/release.md`):
+  clean tree, tests, lint, `npm version --no-git-tag-version`, changelog entry,
+  commit as `Release X.Y.Z`, then a PR
 
 **Requirements:**
 
@@ -288,16 +330,20 @@ autocomplete and type checking.
 ### Medium Priority
 
 4. ~~**No TypeScript definitions**~~ - FIXED: Complete TypeScript support added (issue #4)
-5. **scriptLink inflexible** - No custom attributes like assetLink
-6. **Duplicated code** - Collection filter logic repeated
+5. ~~**SRI hashes base64url encoded**~~ - FIXED: integrity now standard base64 (issue #25)
+6. **scriptLink inflexible** - No custom attributes like assetLink (accepts only
+   `{ throwOnMissing }`, while assetLink accepts arbitrary attributes)
+7. **Duplicated code** - Collection lookup and key-list logic repeated between
+   `assetLink.js` and `scriptLink.js`
 
 ### Low Priority (Nice to Have)
 
-7. **No source map support** - Would help debugging
-8. **Hardcoded SHA-512** - Could be configurable
-9. **Limited documentation** - Missing CHANGELOG, CONTRIBUTING, examples
+8. **No source map support** - Would help debugging
+9. **Hardcoded SHA-512** - Could be configurable (note: any change here must keep
+   the filename/integrity encodings separate)
 
-**See `.github-issues/` for detailed issue templates**
+**Open issues live on GitHub:**
+<https://github.com/stephen-cox/eleventy-template-asset-pipeline/issues>
 
 ## Working with This Codebase
 
@@ -508,8 +554,8 @@ git push origin branch      # Push to remote
 
 ---
 
-**Last Updated:** 2025-11-12
-**Plugin Version:** 0.2.1
+**Last Updated:** 2026-08-23
+**Plugin Version:** 1.1.0
 **Maintained By:** Stephen Cox <web@stephencox.net>
 
 ---
@@ -541,6 +587,10 @@ If any of these fail, DO NOT commit. Fix the issues first.
 
 **Recent Major Changes:**
 
+- 2026-08-23: Fixed SRI integrity hashes being base64url encoded, so browsers
+  ignored them entirely (issue #25) - released as 1.1.0
+- 2025-11-19: Released 1.0.0 with API reference, examples and troubleshooting docs
+- 2025-11-12: Added automated NPM publishing workflow and `/release` command
 - 2025-11-12: Added TypeScript type definitions (issue #4)
 - 2025-11-12: Added ESLint and Prettier for code quality
 - 2025-11-12: Established mandatory pre-commit checks
