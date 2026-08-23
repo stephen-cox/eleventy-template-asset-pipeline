@@ -123,6 +123,52 @@ test("ProcessAssets.processDirectory() - generates cache-busting filenames in pr
 	t.regex(files[0].integrity, /^sha512-/);
 });
 
+test("ProcessAssets.processDirectory() - integrity hash is standard base64, not base64url", async (t) => {
+	const processor = new ProcessAssets({
+		inDirectory: "./test/fixtures",
+		inExtension: "css",
+		outDirectory: "_assets/css",
+		outExtension: "css",
+		processFile: simpleProcessFile,
+		production: true,
+	});
+
+	const files = await processor.processDirectory();
+	const digest = files[0].integrity.replace(/^sha512-/, "");
+
+	// The Subresource Integrity grammar only admits standard base64, so a digest
+	// containing base64url's "-" or "_" is discarded and the check is skipped.
+	t.regex(digest, /^[A-Za-z0-9+/]+={0,2}$/);
+	t.is(digest.length, 88);
+
+	// It must match the SHA-512 of the bytes actually written out.
+	const crypto = await import("crypto");
+	const expected = crypto.createHash("sha512").update(files[0].content).digest("base64");
+	t.is(digest, expected);
+});
+
+test("ProcessAssets.processDirectory() - cache-busting filename stays URL safe", async (t) => {
+	const processor = new ProcessAssets({
+		inDirectory: "./test/fixtures",
+		inExtension: "css",
+		outDirectory: "_assets/css",
+		outExtension: "css",
+		processFile: simpleProcessFile,
+		production: true,
+	});
+
+	const files = await processor.processDirectory();
+	const crypto = await import("crypto");
+	const filenameHash = crypto
+		.createHash("sha512")
+		.update(files[0].content)
+		.digest("base64url")
+		.slice(0, 10)
+		.toUpperCase();
+
+	t.is(files[0].destination, `_assets/css/sample-${filenameHash}.css`);
+});
+
 test("ProcessAssets.processDirectory() - skips .11ty.js files", async (t) => {
 	const fs = await import("fs");
 	const testFile = "./test/fixtures/test.11ty.js";

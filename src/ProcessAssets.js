@@ -261,17 +261,24 @@ class ProcessAssets {
 						// Production build.
 						if (this.production) {
 							try {
-								// Add hash of the content to destination file name for cache busting.
-								const sha512 = crypto.createHash("sha512");
-								const hash = sha512.update(content).digest().toString("base64url");
-								const destination = `${basename}-${hash.slice(0, 10).toUpperCase()}.${this.outExtension}`;
+								const sha512 = crypto.createHash("sha512").update(content);
+
+								// base64url for the cache-busting filename: standard base64 can
+								// contain "/" and "+", which are not safe in a URL path segment.
+								const filenameHash = sha512.copy().digest("base64url");
+								// Standard base64 for the integrity attribute: the Subresource
+								// Integrity grammar admits only standard base64, and browsers
+								// silently ignore metadata they cannot parse.
+								const integrityHash = sha512.digest("base64");
+
+								const destination = `${basename}-${filenameHash.slice(0, 10).toUpperCase()}.${this.outExtension}`;
 
 								files.push({
 									index: filename,
 									source: file,
 									destination: `${this.outDirectory}/${destination}`,
 									content: content,
-									integrity: `sha512-${hash}`,
+									integrity: `sha512-${integrityHash}`,
 								});
 							} catch (error) {
 								throw new Error(
