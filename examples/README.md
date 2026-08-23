@@ -204,7 +204,8 @@ Each example can be customized:
 
 ## Common Issues
 
-See the main [README Troubleshooting section](../README.md#troubleshooting) for common issues and solutions.
+See the [Error Handling section](../README.md#error-handling) of the main README
+for the errors the plugin raises and what they mean.
 
 ## Additional Resources
 

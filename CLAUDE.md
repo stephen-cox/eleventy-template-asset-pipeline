@@ -221,7 +221,7 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 
 **Publishing** (`.github/workflows/publish.yml`):
 
-- Publishes to NPM when a release commit lands on `main`
+- Publishes to NPM (with provenance) when a GitHub Release is published from `main`
 - Prepare releases with the `/release` command (`.claude/commands/release.md`):
   clean tree, tests, lint, `npm version --no-git-tag-version`, changelog entry,
   commit as `Release X.Y.Z`, then a PR
