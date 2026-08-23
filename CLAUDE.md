@@ -381,8 +381,11 @@ console.log("Found files:", files);
 **Debug hash generation:**
 
 ```javascript
-const hash = crypto.createHash("sha512").update(content).digest().toString("base64url");
-console.log("Hash:", hash.slice(0, 10));
+const sha512 = crypto.createHash("sha512").update(content);
+// base64url for the cache-busting filename; standard base64 for SRI (the SRI
+// grammar rejects base64url, and browsers silently ignore what they can't parse).
+console.log("Filename hash:", sha512.copy().digest("base64url").slice(0, 10));
+console.log("Integrity:", `sha512-${sha512.digest("base64")}`);
 ```
 
 ## Context for Common Questions

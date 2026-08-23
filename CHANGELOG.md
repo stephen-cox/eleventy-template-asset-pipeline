@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Subresource Integrity hashes are now standard base64 rather than base64url, so
+  browsers can parse them (Issue #25). The SRI grammar admits only standard
+  base64, so the previous base64url digests were discarded during parsing and the
+  integrity check was skipped entirely — assets were loaded with no verification.
+  Cache-busting filenames continue to use base64url, which is correct there.
+
+  **Behaviour change:** integrity checks are now actually enforced. If the bytes
+  a site serves differ from the bytes 11ty built — a CDN that recompresses or
+  rewrites assets, for example — those assets will now fail to load rather than
+  loading unverified.
+
 ## [1.0.0] - 2025-11-19
 
 ### Added

@@ -71,6 +71,9 @@ export interface ProcessedAsset {
 
 	/**
 	 * Subresource integrity hash (only in production builds).
+	 *
+	 * Formatted as `sha512-<digest>`, where the digest is standard base64 as
+	 * required by the Subresource Integrity specification.
 	 */
 	integrity?: string;
 }

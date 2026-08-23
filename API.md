@@ -245,7 +245,8 @@ async processDirectory()
 - Searches for files matching `inDirectory/*.inExtension`
 - Excludes files ending in `.11ty.js`
 - Calls `processFile()` for each file
-- In production: generates SHA-512 hash for cache busting and SRI
+- In production: generates SHA-512 hash for cache busting (base64url, truncated
+  to 10 characters) and for SRI (standard base64, as the SRI grammar requires)
 - In development: uses original filenames
 
 **Errors:**

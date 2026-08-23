@@ -655,11 +655,19 @@ In production mode, the plugin automatically generates integrity hashes:
 ></script>
 ```
 
+The digest is a SHA-512 hash of the processed content, encoded as standard
+base64 as required by the [SRI specification](https://www.w3.org/TR/SRI/). This
+is deliberately different from the base64url encoding used for cache-busting
+filenames, where `+` and `/` would not be safe in a URL path.
+
 **Compatibility Considerations**:
 
 - SRI requires CORS configuration for cross-origin assets
 - The `crossorigin="anonymous"` attribute is automatically added
 - Older browsers ignore the integrity attribute (graceful degradation)
+- Integrity checks are enforced by the browser: if the bytes served differ from
+  the bytes 11ty built (for instance a CDN that recompresses or rewrites
+  assets), the asset will be blocked
 
 ### ES Module Support
 
