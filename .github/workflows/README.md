@@ -172,27 +172,34 @@ Publishes the package to NPM when a GitHub Release is published from `main`.
 The workflow re-runs the tests and linting against `main`, checks that the
 release tag matches `package.json`, then publishes.
 
-Authentication uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers):
-the job requests an OIDC token from GitHub and npm exchanges it for a
-short-lived credential. There is no `NPM_TOKEN` secret to expire or rotate, and
-provenance is attached automatically.
+Authentication uses the `NPM_TOKEN` repository secret. It must be a granular
+access token created on npmjs.com with **read and write** access to
+`@src-dev/eleventy-template-asset-pipeline` (or to the `@src-dev` scope).
 
-This requires a one-off setup on npmjs.com. On the package page, under
-Settings -> Trusted Publisher, add a GitHub Actions publisher with:
+Two settings have to agree for a token publish to succeed. If either is wrong
+the registry answers `403 Forbidden` - the same response it gives for an expired
+token, so check both before assuming the token is stale:
 
-- Organization or user: `stephen-cox`
-- Repository: `eleventy-template-asset-pipeline`
-- Workflow filename: `publish.yml`
+- **The token.** Granular access tokens expire; npm caps their lifetime, so a
+  token that worked for the last release may simply have run out. Read-only
+  tokens, and tokens whose package list does not include this package, are also
+  refused.
+- **The package.** On npmjs.com under Settings -> Publishing access, the package
+  must allow automation tokens. If it is set to require two-factor
+  authentication on every publish, no CI token can publish it.
 
-If that entry is missing or does not match, the registry rejects the publish
-with `403 Forbidden` after the tarball has been built.
+The job runs `npm whoami` before building the tarball so a bad credential fails
+early with a clear message rather than as a bare 403 at the end.
 
-Two constraints are easy to trip over when editing this workflow:
+`id-token: write` is granted to the publish job because `--provenance` needs it.
 
-- The publish job needs `id-token: write`; without it there is no OIDC token to
-  exchange.
-- Trusted publishing needs npm 11.5.1 or newer, which is why the job upgrades
-  npm before publishing rather than using the version bundled with Node.
+The long-term fix for expiring tokens is
+[trusted publishing](https://docs.npmjs.com/trusted-publishers), where npm
+exchanges the job's OIDC token for a short-lived credential and no secret is
+stored at all. Enabling it requires completing 2FA on npmjs.com to add a trusted
+publisher entry for this repository and `publish.yml`. Worth switching to when
+that is possible; the workflow then drops `NODE_AUTH_TOKEN` and `--provenance`
+(provenance becomes automatic) and needs npm 11.5.1 or newer.
 
 ## Future Workflows
 
