@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write # Required for provenance
 
 jobs:
   validate-release:
@@ -81,6 +80,14 @@ jobs:
     needs: [test, lint]
     runs-on: ubuntu-latest
 
+    # Trusted publishing: npm exchanges this job's OIDC token for a short-lived
+    # credential, so there is no NPM_TOKEN to expire, leak or rotate. The
+    # package must list this repository and workflow as a trusted publisher on
+    # npmjs.com, otherwise the registry rejects the publish with 403.
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,9 +97,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
+
+      # Node 22 ships npm 10.x; trusted publishing needs npm 11.5.1 or newer.
+      - name: Upgrade npm
+        run: |
+          npm install -g npm@latest
+          npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -117,10 +130,10 @@ jobs:
             exit 1
           fi
 
+      # Provenance is generated automatically when publishing via trusted
+      # publishing, so --provenance is not passed here.
       - name: Publish to NPM
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - name: Publish summary
         run: |

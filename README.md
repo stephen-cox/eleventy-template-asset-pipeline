@@ -406,4 +406,6 @@ pass before opening a pull request against `main`.
 Releases are published to NPM by GitHub Actions, with provenance, when a GitHub
 Release is published from `main`. Bump the version and update
 [CHANGELOG.md](CHANGELOG.md) first, then create the release with a tag matching
-`package.json`.
+`package.json`. Publishing authenticates through npm trusted publishing rather
+than a token - see [.github/workflows/README.md](.github/workflows/README.md) for 
+the setup it depends on.

@@ -166,11 +166,38 @@ To add ESLint when ready:
 - npm cache reduces dependency install time
 - `fail-fast: false` may increase duration but provides better feedback
 
+## publish.yml
+
+Publishes the package to NPM when a GitHub Release is published from `main`.
+The workflow re-runs the tests and linting against `main`, checks that the
+release tag matches `package.json`, then publishes.
+
+Authentication uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers):
+the job requests an OIDC token from GitHub and npm exchanges it for a
+short-lived credential. There is no `NPM_TOKEN` secret to expire or rotate, and
+provenance is attached automatically.
+
+This requires a one-off setup on npmjs.com. On the package page, under
+Settings -> Trusted Publisher, add a GitHub Actions publisher with:
+
+- Organization or user: `stephen-cox`
+- Repository: `eleventy-template-asset-pipeline`
+- Workflow filename: `publish.yml`
+
+If that entry is missing or does not match, the registry rejects the publish
+with `403 Forbidden` after the tarball has been built.
+
+Two constraints are easy to trip over when editing this workflow:
+
+- The publish job needs `id-token: write`; without it there is no OIDC token to
+  exchange.
+- Trusted publishing needs npm 11.5.1 or newer, which is why the job upgrades
+  npm before publishing rather than using the version bundled with Node.
+
 ## Future Workflows
 
 Consider adding:
 
-- **publish.yml** - Automated npm publishing on release
 - **codeql.yml** - Code security scanning
 - **coverage.yml** - Code coverage reporting
 - **dependabot.yml** - Automated dependency updates

@@ -222,6 +222,9 @@ t.regex(file.path, /test\/fixtures\/sample\.css$/);
 **Publishing** (`.github/workflows/publish.yml`):
 
 - Publishes to NPM (with provenance) when a GitHub Release is published from `main`
+- Authenticates with npm trusted publishing (OIDC), not an `NPM_TOKEN` secret:
+  the publish job needs `id-token: write`, npm 11.5.1+, and a matching trusted
+  publisher entry on npmjs.com. A mismatch fails with `403 Forbidden`.
 - Prepare releases with the `/release` command (`.claude/commands/release.md`):
   clean tree, tests, lint, `npm version --no-git-tag-version`, changelog entry,
   commit as `Release X.Y.Z`, then a PR
