@@ -80,10 +80,9 @@ jobs:
     needs: [test, lint]
     runs-on: ubuntu-latest
 
-    # Trusted publishing: npm exchanges this job's OIDC token for a short-lived
-    # credential, so there is no NPM_TOKEN to expire, leak or rotate. The
-    # package must list this repository and workflow as a trusted publisher on
-    # npmjs.com, otherwise the registry rejects the publish with 403.
+    # id-token is for provenance only. Publishing authenticates with the
+    # NPM_TOKEN secret, which must be a granular access token with read and
+    # write access to @src-dev/eleventy-template-asset-pipeline.
     permissions:
       contents: read
       id-token: write
@@ -101,14 +100,26 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
 
-      # Node 22 ships npm 10.x; trusted publishing needs npm 11.5.1 or newer.
-      - name: Upgrade npm
-        run: |
-          npm install -g npm@latest
-          npm --version
-
       - name: Install dependencies
         run: npm ci
+
+      # Fail here, with a usable message, rather than with a bare 403 after the
+      # tarball has been built and the provenance statement signed.
+      - name: Check NPM credentials
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "Error: the NPM_TOKEN secret is empty or missing."
+            exit 1
+          fi
+          if ! NPM_USER=$(npm whoami 2>&1); then
+            echo "Error: NPM_TOKEN did not authenticate with the registry."
+            echo "npm said: $NPM_USER"
+            echo "Generate a new granular access token on npmjs.com and update the NPM_TOKEN secret."
+            exit 1
+          fi
+          echo "Authenticated as: $NPM_USER"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Extract version from release tag
         id: get_version
@@ -130,10 +141,10 @@ jobs:
             exit 1
           fi
 
-      # Provenance is generated automatically when publishing via trusted
-      # publishing, so --provenance is not passed here.
       - name: Publish to NPM
-        run: npm publish --access public
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish summary
         run: |
